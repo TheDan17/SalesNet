@@ -66,21 +66,3 @@ jobs:
           # When you need the analysis to take place in a directory other than the one from which it was launched, default is .
           projectBaseDir: .
           
-# You may pin to the exact commit or the version.
-# uses: yumemi-inc/setup-java-gradle@609d3e82f5bdceed0a156c2bba0fea9747f83ef6
-uses: yumemi-inc/setup-java-gradle@v2.0.0
-with:
-  # Java version to use.
-  java-version: # optional, default is 17
-  # Java distribution to use.
-  java-distribution: # optional, default is zulu
-  # Whether to read/write Gradle cache.
-  cache-disabled: # optional, default is false
-  # Whether to only read Gradle cache.
-  cache-read-only: # optional, default is true
-  # Whether to remove stale/unused Gradle cache before writing.
-  gradle-home-cache-cleanup: # optional, default is false
-  # Whether to display Gradle build reports in Job Summaries.
-  gradle-build-report: # optional, default is always
-  # Whether to apply Kotlin compiler Problem Matchers.
-  kotlin-compiler-report: # optional, default is true
