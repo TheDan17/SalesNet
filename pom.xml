@@ -8,10 +8,10 @@
 		<version>3.4.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.dealhive</groupId>
-	<artifactId>SalesNet</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>SalesNet</name>
+	<groupId>com.thedan17</groupId>
+	<artifactId>sales_net</artifactId>
+	<version>0.0.1</version>
+	<name>sales_net</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>22</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
