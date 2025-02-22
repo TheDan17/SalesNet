@@ -8,6 +8,7 @@ class SalesNetApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// just template
 	}
 
 }
