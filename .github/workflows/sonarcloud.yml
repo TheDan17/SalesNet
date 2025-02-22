@@ -43,6 +43,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with: 
+          fetch-depth: 0
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with: 
+          java-version: '21'
+          distribution: 'temurin'
       - name: Analyze with SonarCloud
 
         # You can pin the exact commit or the version.
