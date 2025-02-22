@@ -53,19 +53,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-
-      - name: Setup Java - Gradle
-              # You may pin to the exact commit or the version.
-          # uses: yumemi-inc/setup-java-gradle@609d3e82f5bdceed0a156c2bba0fea9747f83ef6
-        uses: yumemi-inc/setup-java-gradle@v2.0.0
-        with:
-          java-distribution: 'zulu' # optional, default is zulu
-          cache-disabled: false # optional, default is false
-          cache-read-only: true # optional, default is true
-          gradle-home-cache-cleanup: false # optional, default is false
-          gradle-build-report: 'always' # optional, default is always
-          kotlin-compiler-report: true # optional, default is true
-
       - name: Build with Maven
         run: mvn clean compile
           
