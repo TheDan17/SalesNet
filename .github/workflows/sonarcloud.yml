@@ -52,9 +52,16 @@ jobs:
         with: 
           java-version: '21'
           distribution: 'temurin'
+      #- name: Setup Maven
+      #  uses: stCarolas/setup-maven@v4
+      #  with:
+      #    maven-version: 4.0.0
 
       - name: Build with Maven
         run: mvn clean compile
+
+      #- name: Build with Maven verify
+      #  run: mvn clean verify
           
       - name: Analyze with SonarCloud
 
