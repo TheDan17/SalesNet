@@ -90,7 +90,7 @@ public class AccountController {
   /** DELETE endpoint для удаления существующего {@code Account}. */
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
-    if (accountService.deleteAccount(id)) {
+    if (Boolean.TRUE.equals(accountService.deleteAccount(id))) {
       return ResponseEntity.ok().build();
     } else {
       return ResponseEntity.notFound().build();

@@ -43,6 +43,7 @@ public class Group {
    *
    * @deprecated Уже устаревший метод с сомнительной полезностью
    */
+  @Deprecated
   public AccGroupLink addAccount(Account account) {
     AccGroupLink link = new AccGroupLink();
     link.setAccount(account);
@@ -57,6 +58,7 @@ public class Group {
    *
    * @deprecated Так же устарел, как и {@code addAccount(...)}
    */
+  @Deprecated
   public Set<Account> getAccounts() {
     Set<Account> accounts = new HashSet<>(Set.of());
     for (AccGroupLink member : this.members) {

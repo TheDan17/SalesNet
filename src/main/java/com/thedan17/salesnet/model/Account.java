@@ -45,12 +45,9 @@ public class Account {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AccGroupLink> members = new HashSet<>();
 
-  /** Стандартный конструктор для совместимости с Spring. */
-  public Account() {}
-
   /** Получение объектов {@code Group} из связей. */
   public List<Group> getGroups() {
-    List<Group> groups = new ArrayList<Group>();
+    List<Group> groups = new ArrayList<>();
     for (AccGroupLink member : this.members) {
       groups.add(member.getGroup());
     }

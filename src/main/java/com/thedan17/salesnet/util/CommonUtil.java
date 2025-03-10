@@ -5,6 +5,11 @@ import java.util.function.Supplier;
 
 /** Класс для статических вспомогательных методов, предназначенных для общего использования. */
 public class CommonUtil {
+  /** Конструктор для предотвращения создания экземпляра класса. */
+  private CommonUtil() {
+    throw new IllegalStateException("Utility class!");
+  }
+
   /**
    * Метод для преобразования исключения в {@code Optional<>}.
    *
@@ -24,7 +29,7 @@ public class CommonUtil {
       if (exceptionType.isInstance(e)) {
         return Optional.empty();
       }
-      throw new RuntimeException(e);
+      throw e;
     }
   }
 }

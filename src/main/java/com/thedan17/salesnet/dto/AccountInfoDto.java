@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class AccountInfoDto {
   private Long id;
-  public String fullName;
+  private String fullName;
   private String type;
   private LocalDateTime createdAt;
 }

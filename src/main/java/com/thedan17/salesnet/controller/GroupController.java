@@ -56,8 +56,8 @@ public class GroupController {
   /** READ endpoint - Получение аккаунтов, подходящих по опциональным параметрам. */
   @GetMapping("/search")
   public ResponseEntity<?> searchGroups(@RequestParam(required = true) String name) {
-    if (name.length() <= 3) { // TODO
-      return ResponseEntity.badRequest().build();
+    if (name.length() <= 3) {
+      return ResponseEntity.badRequest().body("To search groups by name, request length must be more than 3");
     }
     return ResponseEntity.ok(groupService.searchGroups(name));
   }
@@ -77,7 +77,7 @@ public class GroupController {
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteGroup(@PathVariable Long id) {
-    if (groupService.deleteGroup(id)) {
+    if (Boolean.TRUE.equals(groupService.deleteGroup(id))) {
       return ResponseEntity.ok().build();
     }
     return ResponseEntity.badRequest().build();
