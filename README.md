@@ -10,24 +10,31 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=TheDan17_SalesNet&metric=coverage)](https://sonarcloud.io/summary/new_code?id=TheDan17_SalesNet)
 
 ### Разрабатывается на следующих версиях:
+
+**Технологии**
 - `Java 21`
 - `Maven 4.0.0`
-- `Spring Boot 3.4.3`
 - `PostgreSQL 16.3`
+
+**Библиотеки**
+- `Spring Boot 3.4.3`
+- `Lombok 1.18.30`
+- `MapStruct 1.5.5.Final`
 
 ### Основные возможности
 ✅ Регистрация пользователей (физические (даже если не ИП)/юридические лица)
-
+\
 ✅ Создание объявлений с фото
-
+\
 ✅ Поиск по товарам и услугам
-
+\
 ✅ Чат между покупателями и продавцами
-
+\
 ✅ Система рейтингов и отзывов
+\
+✅ Шифрование паролей с помощью SHA256
 
 ### Настройка
-
 Перед запуском необходимо задать переменные окружения для подключения к бд.
 Названия следующие:
 - `DB_URL` - адрес хоста и имя бд, например, `jdbc:postgresql://localhost:5432/test`
@@ -36,5 +43,5 @@
 
 ### Контакты
 Автор: TheDan17 ([GitHub](https://github.com/TheDan17), [Telegram](https://t.me/thedan17))
-
+\
 Email: lenchikov.daniil@yandex.ru
