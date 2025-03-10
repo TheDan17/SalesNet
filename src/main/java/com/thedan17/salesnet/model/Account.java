@@ -32,7 +32,7 @@ public class Account {
   private Long id;
 
   // service data
-  private String login; // TODO: must be unique
+  private String login;
   private String email;
   private String passwordHash;
 

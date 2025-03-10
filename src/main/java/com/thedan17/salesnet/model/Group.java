@@ -34,36 +34,4 @@ public class Group {
     this.name = name;
     this.description = description;
   }
-
-  /** Стандартный конструктор для совместимости со Spring. */
-  public Group() {}
-
-  /**
-   * Метод для косвенного добавления {@code Account} в {@code Group}.
-   *
-   * @deprecated Уже устаревший метод с сомнительной полезностью
-   */
-  @Deprecated
-  public AccGroupLink addAccount(Account account) {
-    AccGroupLink link = new AccGroupLink();
-    link.setAccount(account);
-    link.setGroup(this);
-    this.members.add(link);
-    account.getMembers().add(link);
-    return link;
-  }
-
-  /**
-   * Метод для кастомного получения {@code Account}-участников, путём перебора связей.
-   *
-   * @deprecated Так же устарел, как и {@code addAccount(...)}
-   */
-  @Deprecated
-  public Set<Account> getAccounts() {
-    Set<Account> accounts = new HashSet<>(Set.of());
-    for (AccGroupLink member : this.members) {
-      accounts.add(member.getAccount());
-    }
-    return accounts;
-  }
 }

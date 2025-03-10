@@ -40,6 +40,4 @@ public class AccGroupLink {
 
   private final LocalDateTime linkedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-  /** Стандартный конструктор для совместимости с Spring. */
-  public AccGroupLink() {}
 }
