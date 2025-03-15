@@ -2,8 +2,6 @@
 
 Социальная сеть для продаж между физическими и юридическими лицами с ориентацией на СНГ рынок.
 
-[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg)](https://sonarcloud.io/summary/new_code?id=TheDan17_SalesNet)
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=TheDan17_SalesNet&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=TheDan17_SalesNet)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=TheDan17_SalesNet&metric=bugs)](https://sonarcloud.io/summary/new_code?id=TheDan17_SalesNet)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=TheDan17_SalesNet&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=TheDan17_SalesNet)
