@@ -2,6 +2,7 @@ package com.thedan17.salesnet.service;
 
 import com.thedan17.salesnet.dao.GroupRepository;
 import com.thedan17.salesnet.dto.AccountInfoDto;
+import com.thedan17.salesnet.dto.GroupCreateDto;
 import com.thedan17.salesnet.dto.GroupDto;
 import com.thedan17.salesnet.dto.GroupIdDto;
 import com.thedan17.salesnet.model.Group;
@@ -13,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +40,9 @@ public class GroupService {
 
   /** Метод создания нового {@code Group} и возврата информации о нём. */
   @Transactional
-  public Optional<GroupIdDto> addGroup(GroupDto newGroup) {
+  public Optional<GroupIdDto> addGroup(GroupCreateDto newGroup) {
     return CommonUtil.optionalFromException(
-        () -> mapperService.groupToIdDto(groupDao.save(mapperService.dtoToGroup(newGroup))),
+        () -> mapperService.groupToIdDto(groupDao.save(mapperService.createDtoToGroup(newGroup))),
         DataIntegrityViolationException.class);
   }
 
@@ -51,9 +53,9 @@ public class GroupService {
    */
   @Transactional
   public Boolean deleteGroup(Long id) {
-    try {
+    if(groupDao.existsById(id)) {
       groupDao.deleteById(id);
-    } catch (Exception e) {
+    } else {
       return false;
     }
     return true;
@@ -102,13 +104,16 @@ public class GroupService {
 
   /** Обновление уже существующей {@code Group}. */
   @Transactional
-  public Optional<GroupIdDto> updateGroup(Long id, Group newGroup) {
-    Group group = groupDao.findById(id).orElseThrow();
-    group.setName(newGroup.getName());
-    group.setDescription(newGroup.getDescription());
-    group.setCreatedAt(newGroup.getCreatedAt());
+  public Optional<GroupIdDto> updateGroup(Long id, GroupCreateDto newGroupDto) {
+    Group newGroup = mapperService.createDtoToGroup(newGroupDto);
+    Optional<Group> group = groupDao.findById(id);
+    if (group.isEmpty()) {
+      return Optional.empty();
+    }
+    group.get().setName(newGroup.getName());
+    group.get().setDescription(newGroup.getDescription());
     return CommonUtil.optionalFromException(
-        () -> mapperService.groupToIdDto(groupDao.save(group)),
+        () -> mapperService.groupToIdDto(groupDao.save(group.get())),
         DataIntegrityViolationException.class);
   }
 }

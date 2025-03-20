@@ -1,11 +1,6 @@
 package com.thedan17.salesnet.service;
 
-import com.thedan17.salesnet.dto.AccGroupLinkDto;
-import com.thedan17.salesnet.dto.AccountInfoDto;
-import com.thedan17.salesnet.dto.AccountLoginDto;
-import com.thedan17.salesnet.dto.AccountUpdateDto;
-import com.thedan17.salesnet.dto.GroupDto;
-import com.thedan17.salesnet.dto.GroupIdDto;
+import com.thedan17.salesnet.dto.*;
 import com.thedan17.salesnet.model.AccGroupLink;
 import com.thedan17.salesnet.model.Account;
 import com.thedan17.salesnet.model.Group;
@@ -39,11 +34,14 @@ public interface MapperService {
   /** Маппинг для GET запроса Group. */
   GroupIdDto groupToIdDto(Group group);
 
-  /** Маппинг для POST запроса Group. */
+  /** Маппинг для TODO запроса Group. */
   Group idDtoToGroup(GroupIdDto groupIdDto);
 
-  /** Маппинг для UPDATE запроса Group. */
+  /** Маппинг для TODO запроса Group. */
   Group dtoToGroup(GroupDto groupDto);
+
+  /** Маппинг для POST, UPDATE запроса Group. */
+  Group createDtoToGroup(GroupCreateDto groupCreateDto);
 
   /** Маппинг для возвращаемого значения POST запроса создания связи. */
   @Mapping(target = "groupId", expression = "java(accGroupLink.getGroup().getId())")

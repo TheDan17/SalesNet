@@ -72,7 +72,7 @@ public class AccGroupLinkController {
       accGroupLinkService.unlinkAccWithGroup(accId, id);
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      return ResponseEntity.badRequest().build();
+      return ResponseEntity.notFound().build();
     }
   }
 
@@ -97,7 +97,7 @@ public class AccGroupLinkController {
       accGroupLinkService.unlinkAccWithGroup(id, groupId);
       return ResponseEntity.noContent().build();
     } catch (EntityNotFoundException e) {
-      return ResponseEntity.badRequest().build();
+      return ResponseEntity.notFound().build();
     }
   }
 }

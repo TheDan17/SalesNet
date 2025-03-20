@@ -39,6 +39,11 @@ public class Account {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AccGroupLink> members = new HashSet<>();
 
+  /** Дефолтный конструктор для создания связей */
+  public Account() {
+    // Just default constructor
+  }
+
   /** Получение объектов {@code Group} из связей. */
   @Transient
   public List<Group> getGroups() {

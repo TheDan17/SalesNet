@@ -102,7 +102,7 @@ public class AccountService {
 
   /** Метод фильтрации всех {@code Account} из бд по опциональным критериям. */
   @Transactional
-  public Optional<List<AccountInfoDto>> searchAccounts(
+  public List<AccountInfoDto> searchAccounts(
       String firstName, String secondName, String type) {
     Specification<Account> spec =
         (root, query, criteriaBuilder) -> {
@@ -119,14 +119,11 @@ public class AccountService {
           return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     List<Account> accountList = dao.findAll(spec);
-    if (accountList.isEmpty()) {
-      return Optional.empty();
-    }
     List<AccountInfoDto> accountInfoDtoList = new ArrayList<>();
     for (var account : accountList) {
       accountInfoDtoList.add(mapperService.accountToInfoDto(account));
     }
-    return Optional.of(accountInfoDtoList);
+    return accountInfoDtoList;
   }
 
   /** Метод обновления информации о Account, но только разрешённых полей путём отдельного DTO. */

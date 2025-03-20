@@ -1,6 +1,7 @@
 package com.thedan17.salesnet.controller;
 
 import com.thedan17.salesnet.dto.AccountInfoDto;
+import com.thedan17.salesnet.dto.GroupCreateDto;
 import com.thedan17.salesnet.dto.GroupDto;
 import com.thedan17.salesnet.dto.GroupIdDto;
 import com.thedan17.salesnet.model.Group;
@@ -8,6 +9,7 @@ import com.thedan17.salesnet.service.GroupService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +29,7 @@ public class GroupController {
 
   /** CREATE endpoint - Создание нового {@code Group}. */
   @PostMapping
-  public ResponseEntity<?> createGroup(@RequestBody GroupDto newGroup) {
+  public ResponseEntity<?> createGroup(@RequestBody GroupCreateDto newGroup) {
     return groupService
         .addGroup(newGroup)
         .map(ResponseEntity::ok)
@@ -64,11 +66,11 @@ public class GroupController {
 
   /** UPDATE endpoint - Обновление информации о группе. */
   @PutMapping("/{id}")
-  public ResponseEntity<?> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
+  public ResponseEntity<?> updateGroup(@PathVariable Long id, @RequestBody GroupCreateDto updatedGroup) {
     Optional<GroupIdDto> groupIdDto = groupService.updateGroup(id, updatedGroup);
     return groupIdDto
         .map(ResponseEntity::ok) // Если Optional содержит группу
-        .orElse(ResponseEntity.notFound().build()); // Если Optional пустой
+        .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build()); // Если Optional пустой
   }
 
   /** DELETE endpoint - Удаление группы, существующей с таким id.
@@ -77,9 +79,9 @@ public class GroupController {
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteGroup(@PathVariable Long id) {
-    if (Boolean.TRUE.equals(groupService.deleteGroup(id))) {
-      return ResponseEntity.ok().build();
+    if (groupService.deleteGroup(id)) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-    return ResponseEntity.badRequest().build();
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
   }
 }

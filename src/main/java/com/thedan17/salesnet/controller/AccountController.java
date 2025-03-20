@@ -8,6 +8,8 @@ import com.thedan17.salesnet.service.AccountService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +37,9 @@ public class AccountController {
   public ResponseEntity<?> createAccount(@RequestBody AccountLoginDto account) {
     Optional<AccountInfoDto> accountInfoDto = accountService.addAccount(account);
     if (accountInfoDto.isEmpty()) {
-      return ResponseEntity.badRequest().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     } else {
-      return ResponseEntity.ok(accountInfoDto.get());
+      return ResponseEntity.status(HttpStatus.CREATED).body(accountInfoDto.get());
     }
   }
 
@@ -46,9 +48,9 @@ public class AccountController {
   public ResponseEntity<?> getAccountById(@PathVariable Long id) {
     Optional<AccountInfoDto> accountInfoDto = accountService.getAccountById(id);
     if (accountInfoDto.isEmpty()) {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     } else {
-      return ResponseEntity.ok(accountInfoDto.get());
+      return ResponseEntity.status(HttpStatus.OK).body(accountInfoDto.get());
     }
   }
 
@@ -57,9 +59,9 @@ public class AccountController {
   public ResponseEntity<?> getAccountGroups(@PathVariable Long id) {
     Optional<List<GroupIdDto>> groupDtoList = accountService.getAccountGroups(id);
     if (groupDtoList.isEmpty()) {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-    return ResponseEntity.ok(groupDtoList.get());
+    return ResponseEntity.status(HttpStatus.OK).body(groupDtoList.get());
   }
 
   /** READ endpoint для поиска {@code Account} по опциональным параметрам. */
@@ -68,12 +70,9 @@ public class AccountController {
       @RequestParam(required = false) String firstName,
       @RequestParam(required = false) String secondName,
       @RequestParam(required = false) String type) {
-    Optional<List<AccountInfoDto>> accountInfoDtoList =
-        accountService.searchAccounts(firstName, secondName, type);
-    if (accountInfoDtoList.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    return ResponseEntity.ok(accountInfoDtoList.get());
+    List<AccountInfoDto> accountInfoDtoList =
+            accountService.searchAccounts(firstName, secondName, type);
+    return ResponseEntity.status(HttpStatus.OK).body(accountInfoDtoList);
   }
 
   /** UPDATE endpoint для обновления уже существующего {@code Account} по разрешённым полям. */
@@ -82,18 +81,18 @@ public class AccountController {
           @PathVariable Long id, @RequestBody AccountUpdateDto updatedAccount) {
     Optional<AccountInfoDto> accountInfoDto = accountService.updateAccount(id, updatedAccount);
     if (accountInfoDto.isEmpty()) {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-    return ResponseEntity.ok(accountInfoDto.get());
+    return ResponseEntity.status(HttpStatus.OK).body(accountInfoDto.get());
   }
 
   /** DELETE endpoint для удаления существующего {@code Account}. */
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
     if (Boolean.TRUE.equals(accountService.deleteAccount(id))) {
-      return ResponseEntity.ok().build();
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 }

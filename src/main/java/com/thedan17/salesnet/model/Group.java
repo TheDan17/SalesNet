@@ -29,9 +29,13 @@ public class Group {
   @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AccGroupLink> members = new HashSet<>();
 
-  /** Конструктор для совместимости с компонентами сервиса. */
+  /** Конструктор инициализации для Spring. */
   public Group(String name, String description) {
     this.name = name;
     this.description = description;
+  }
+  /** Дефолтный конструктор для создания связей */
+  public Group() {
+    // Just default constructor
   }
 }
