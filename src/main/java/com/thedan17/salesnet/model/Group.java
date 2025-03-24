@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -16,12 +17,15 @@ import lombok.Data;
 /** Сущность для представления существующей группы, в которому могут вступать {@code Account}. */
 @Entity
 @Data
-@Table(name = "groups")
+@Table(
+    name = "groups",
+    indexes = {@Index(columnList = "customId", unique = true)})
 public class Group {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private String customId;
   private String name;
   private String description;
   private LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);

@@ -55,15 +55,6 @@ public class GroupController {
     return ResponseEntity.notFound().build();
   }
 
-  /** READ endpoint - Получение аккаунтов, подходящих по опциональным параметрам. */
-  @GetMapping("/search")
-  public ResponseEntity<?> searchGroups(@RequestParam(required = true) String name) {
-    if (name.length() <= 3) {
-      return ResponseEntity.badRequest().body("To search groups by name, request length must be more than 3");
-    }
-    return ResponseEntity.ok(groupService.searchGroups(name));
-  }
-
   /** UPDATE endpoint - Обновление информации о группе. */
   @PutMapping("/{id}")
   public ResponseEntity<?> updateGroup(@PathVariable Long id, @RequestBody GroupCreateDto updatedGroup) {
