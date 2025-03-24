@@ -38,4 +38,8 @@ public class Group {
     this.name = name;
     this.description = description;
   }
+  /** Дефолтный конструктор для совместимости со Spring. */
+  public Group () {
+    // just default constructor
+  }
 }
