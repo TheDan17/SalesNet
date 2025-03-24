@@ -38,8 +38,4 @@ public class Group {
     this.name = name;
     this.description = description;
   }
-  /** Дефолтный конструктор для создания связей */
-  public Group() {
-    // Just default constructor
-  }
 }

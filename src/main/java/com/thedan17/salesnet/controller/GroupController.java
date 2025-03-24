@@ -2,9 +2,7 @@ package com.thedan17.salesnet.controller;
 
 import com.thedan17.salesnet.dto.AccountInfoDto;
 import com.thedan17.salesnet.dto.GroupCreateDto;
-import com.thedan17.salesnet.dto.GroupDto;
 import com.thedan17.salesnet.dto.GroupIdDto;
-import com.thedan17.salesnet.model.Group;
 import com.thedan17.salesnet.service.GroupService;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Контроллер для операций, связанных непосредственно с сущностью {@code Group}. */
@@ -57,14 +54,16 @@ public class GroupController {
 
   /** UPDATE endpoint - Обновление информации о группе. */
   @PutMapping("/{id}")
-  public ResponseEntity<?> updateGroup(@PathVariable Long id, @RequestBody GroupCreateDto updatedGroup) {
+  public ResponseEntity<?> updateGroup(
+      @PathVariable Long id, @RequestBody GroupCreateDto updatedGroup) {
     Optional<GroupIdDto> groupIdDto = groupService.updateGroup(id, updatedGroup);
     return groupIdDto
-        .map(ResponseEntity::ok) // Если Optional содержит группу
+        .map(ResponseEntity::ok) // Если Optional содержиLт группу
         .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build()); // Если Optional пустой
   }
 
-  /** DELETE endpoint - Удаление группы, существующей с таким id.
+  /**
+   * DELETE endpoint - Удаление группы, существующей с таким id.
    *
    * <p>Существующие связи удаляться путём настроенного каскадирования
    */

@@ -53,7 +53,7 @@ public class GroupService {
    */
   @Transactional
   public Boolean deleteGroup(Long id) {
-    if(groupDao.existsById(id)) {
+    if (groupDao.existsById(id)) {
       groupDao.deleteById(id);
     } else {
       return false;

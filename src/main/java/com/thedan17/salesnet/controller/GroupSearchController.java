@@ -5,14 +5,19 @@ import com.thedan17.salesnet.service.GroupSearchCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+/** Контроллер специально для кэшируемого поиска групп по параметрам. */
 @RestController
 @RequestMapping("/api/groups")
 public class GroupSearchController {
   @Autowired GroupSearchCacheService groupSearchCacheService;
   @Autowired AccountRepository accountRepository;
 
+  /** Непосредственно поиск. */
   @GetMapping("/search")
   public ResponseEntity<?> searchGroups(
       @RequestParam String name, @RequestParam(required = false) Long accId) {

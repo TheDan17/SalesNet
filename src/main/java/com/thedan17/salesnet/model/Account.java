@@ -1,7 +1,14 @@
 package com.thedan17.salesnet.model;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,7 +46,7 @@ public class Account {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AccGroupLink> members = new HashSet<>();
 
-  /** Дефолтный конструктор для создания связей */
+  /** Дефолтный конструктор для создания связей. */
   public Account() {
     // Just default constructor
   }

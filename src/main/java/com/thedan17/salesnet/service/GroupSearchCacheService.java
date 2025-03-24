@@ -4,18 +4,17 @@ import com.thedan17.salesnet.dao.AccGroupLinkRepository;
 import com.thedan17.salesnet.dao.GroupSearchRepository;
 import com.thedan17.salesnet.dto.GroupIdDto;
 import com.thedan17.salesnet.model.Group;
-
+import com.thedan17.salesnet.util.CacheService;
+import com.thedan17.salesnet.util.CommonUtil;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import com.thedan17.salesnet.util.CacheService;
-import com.thedan17.salesnet.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Сервис с настроенным кэшированным поиском групп по различным параметрам. */
 @Service
@@ -51,7 +50,9 @@ public class GroupSearchCacheService {
 
   /** Конструктор класса. */
   public GroupSearchCacheService(
-          GroupSearchRepository groupSearchRepository, AccGroupLinkRepository accGroupLinkRepository, MapperService mapperService) {
+      GroupSearchRepository groupSearchRepository,
+      AccGroupLinkRepository accGroupLinkRepository,
+      MapperService mapperService) {
     this.groupSearchRepository = groupSearchRepository;
     this.accGroupLinkRepository = accGroupLinkRepository;
     this.mapperService = mapperService;
@@ -66,19 +67,23 @@ public class GroupSearchCacheService {
    * @param name частичное имя группы, обязательный параметр, иначе {@code Optional.empty()}
    * @param accId поиск среди групп, в которых состоит этот аккаунт
    */
+  @Transactional
   public Optional<Set<GroupIdDto>> searchGroups(String name, Long accId) {
     Optional<Set<Group>> results;
     if (name != null && accId != null) {
-      results = CommonUtil.optionalFromException(
-          () -> byNameFromAccCache.doAction(Pair.of(name, accId)), Exception.class);
+      results =
+          CommonUtil.optionalFromException(
+              () -> byNameFromAccCache.doAction(Pair.of(name, accId)), Exception.class);
     } else if (name != null) {
-      results = CommonUtil.optionalFromException(
-          () -> byNameFromAllCache.doAction(name), Exception.class);
+      results =
+          CommonUtil.optionalFromException(
+              () -> byNameFromAllCache.doAction(name), Exception.class);
     } else {
       results = Optional.empty();
     }
-    if (results.isEmpty())
+    if (results.isEmpty()) {
       return Optional.empty();
+    }
     Set<GroupIdDto> resultsDto = new HashSet<>();
     for (Group group : results.get()) {
       resultsDto.add(mapperService.groupToIdDto(group));
