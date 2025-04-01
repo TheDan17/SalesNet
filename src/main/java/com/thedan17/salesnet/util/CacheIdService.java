@@ -53,7 +53,7 @@ public class CacheIdService<KeyT, EntityT, IdT> {
   /** Конструктор для задания настроек класса. */
   public CacheIdService(Function<EntityT, IdT> getIdFunc, long sizeOfCache, short clearPercentage) {
     if (clearPercentage < 1 || clearPercentage > 100) {
-      throw new RuntimeException("Clear percentage in CacheService must be between 1 and 100");
+      throw new RuntimeException("Clear percentage in CacheIdService must be between 1 and 100");
     }
     this.cacheMaxSize = sizeOfCache;
     this.clearPercentage = clearPercentage;
