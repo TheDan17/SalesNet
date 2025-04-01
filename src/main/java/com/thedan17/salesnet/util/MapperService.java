@@ -1,4 +1,4 @@
-package com.thedan17.salesnet.service;
+package com.thedan17.salesnet.util;
 
 import com.thedan17.salesnet.dto.AccGroupLinkDto;
 import com.thedan17.salesnet.dto.AccountInfoDto;

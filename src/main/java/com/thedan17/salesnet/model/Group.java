@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
+import lombok.ToString;
 
 /** Сущность для представления существующей группы, в которому могут вступать {@code Account}. */
 @Entity
@@ -25,12 +26,16 @@ public class Group {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @ToString.Exclude
   private String customId;
   private String name;
+  @ToString.Exclude
   private String description;
+  @ToString.Exclude
   private LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
   @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ToString.Exclude
   private Set<AccGroupLink> members = new HashSet<>();
 
   /** Конструктор инициализации для Spring. */

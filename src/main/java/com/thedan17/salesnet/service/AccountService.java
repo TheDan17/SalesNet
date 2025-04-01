@@ -6,6 +6,7 @@ import com.thedan17.salesnet.dto.AccountLoginDto;
 import com.thedan17.salesnet.dto.AccountUpdateDto;
 import com.thedan17.salesnet.dto.GroupIdDto;
 import com.thedan17.salesnet.model.Account;
+import com.thedan17.salesnet.util.MapperService;
 import jakarta.persistence.criteria.Predicate;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

@@ -4,13 +4,15 @@ import com.thedan17.salesnet.dao.AccGroupLinkRepository;
 import com.thedan17.salesnet.dao.GroupSearchRepository;
 import com.thedan17.salesnet.dto.GroupIdDto;
 import com.thedan17.salesnet.model.Group;
-import com.thedan17.salesnet.util.CacheService;
+import com.thedan17.salesnet.util.CacheIdService;
 import com.thedan17.salesnet.util.CommonUtil;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import com.thedan17.salesnet.util.MapperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 /** Сервис с настроенным кэшированным поиском групп по различным параметрам. */
 @Service
 public class GroupSearchCacheService {
-  private final CacheService<String, Group> byNameFromAllCache;
-  private final CacheService<Pair<String, Long>, Group> byNameFromAccCache;
+  private final CacheIdService<String, Group, Long> byNameFromAllCache;
+  private final CacheIdService<Pair<String, Long>, Group, Long> byNameFromAccCache;
   @Autowired private final GroupSearchRepository groupSearchRepository;
   @Autowired private final AccGroupLinkRepository accGroupLinkRepository;
   @Autowired private final MapperService mapperService;
@@ -56,8 +58,8 @@ public class GroupSearchCacheService {
     this.groupSearchRepository = groupSearchRepository;
     this.accGroupLinkRepository = accGroupLinkRepository;
     this.mapperService = mapperService;
-    byNameFromAllCache = new CacheService<>(500L, (short) 10);
-    byNameFromAccCache = new CacheService<>(500L, (short) 10);
+    byNameFromAllCache = new CacheIdService<>(Group::getId, 500L, (short)10);
+    byNameFromAccCache = new CacheIdService<>(Group::getId, 500L, (short)10);
     setCacheFunctionality();
   }
 
@@ -73,11 +75,12 @@ public class GroupSearchCacheService {
     if (name != null && accId != null) {
       results =
           CommonUtil.optionalFromException(
-              () -> byNameFromAccCache.doAction(Pair.of(name, accId)), Exception.class);
+              () -> byNameFromAccCache.doAction(Pair.of(name.toLowerCase(), accId)),
+              Exception.class);
     } else if (name != null) {
       results =
           CommonUtil.optionalFromException(
-              () -> byNameFromAllCache.doAction(name), Exception.class);
+              () -> byNameFromAllCache.doAction(name.toLowerCase()), Exception.class);
     } else {
       results = Optional.empty();
     }
@@ -89,5 +92,10 @@ public class GroupSearchCacheService {
       resultsDto.add(mapperService.groupToIdDto(group));
     }
     return Optional.of(resultsDto);
+  }
+
+  public void updateExistingCache(Group group, CacheIdService.UpdateReason updateReason) {
+    byNameFromAllCache.updateCache(group, updateReason, true);
+    byNameFromAccCache.updateCache(group, updateReason, true);
   }
 }

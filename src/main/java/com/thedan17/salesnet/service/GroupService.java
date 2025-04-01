@@ -3,10 +3,11 @@ package com.thedan17.salesnet.service;
 import com.thedan17.salesnet.dao.GroupRepository;
 import com.thedan17.salesnet.dto.AccountInfoDto;
 import com.thedan17.salesnet.dto.GroupCreateDto;
-import com.thedan17.salesnet.dto.GroupDto;
 import com.thedan17.salesnet.dto.GroupIdDto;
 import com.thedan17.salesnet.model.Group;
+import com.thedan17.salesnet.util.CacheIdService;
 import com.thedan17.salesnet.util.CommonUtil;
+import com.thedan17.salesnet.util.MapperService;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupService {
   @Autowired private final GroupRepository groupDao;
   @Autowired private final MapperService mapperService;
+  @Autowired private final GroupSearchCacheService groupSearchCacheService; // TODO notify about mofidying
 
   /** Внутренний метод для получения сущности {@code Group} напрямую. */
   @Transactional
@@ -33,17 +34,23 @@ public class GroupService {
   }
 
   /** Конструктор с полями класса. */
-  public GroupService(GroupRepository groupDao, MapperService mapperService) {
+  public GroupService(GroupRepository groupDao, MapperService mapperService, GroupSearchCacheService groupSearchCacheService) {
     this.groupDao = groupDao;
     this.mapperService = mapperService;
+    this.groupSearchCacheService = groupSearchCacheService;
   }
 
   /** Метод создания нового {@code Group} и возврата информации о нём. */
   @Transactional
   public Optional<GroupIdDto> addGroup(GroupCreateDto newGroup) {
-    return CommonUtil.optionalFromException(
-        () -> mapperService.groupToIdDto(groupDao.save(mapperService.createDtoToGroup(newGroup))),
-        DataIntegrityViolationException.class);
+    Group result_inner;
+    try {
+      result_inner = groupDao.save(mapperService.createDtoToGroup(newGroup));
+      groupSearchCacheService.updateExistingCache(result_inner, CacheIdService.UpdateReason.ENTITY_ADDED);
+    } catch (DataIntegrityViolationException e) {
+      return Optional.empty();
+    }
+    return Optional.of(mapperService.groupToIdDto(result_inner));
   }
 
   /**
@@ -53,8 +60,10 @@ public class GroupService {
    */
   @Transactional
   public Boolean deleteGroup(Long id) {
-    if (groupDao.existsById(id)) {
+    Optional<Group> group = groupDao.findById(id);
+    if (group.isPresent()) {
       groupDao.deleteById(id);
+      groupSearchCacheService.updateExistingCache(group.get(), CacheIdService.UpdateReason.ENTITY_DELETED);
     } else {
       return false;
     }
@@ -112,6 +121,7 @@ public class GroupService {
     }
     group.get().setName(newGroup.getName());
     group.get().setDescription(newGroup.getDescription());
+    groupSearchCacheService.updateExistingCache(group.get(), CacheIdService.UpdateReason.ENTITY_EDITED);
     return CommonUtil.optionalFromException(
         () -> mapperService.groupToIdDto(groupDao.save(group.get())),
         DataIntegrityViolationException.class);

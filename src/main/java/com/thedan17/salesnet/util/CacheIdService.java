@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,25 +19,28 @@ import org.slf4j.LoggerFactory;
  * <p>Изначально спроектирован для хранения результатов поиска, где каждому сочетанию параметров
  * соответствует список подходящих объектов. Предполагается использование в одном потоке
  *
- * <p>Перед работой необходимо задать функции через метод {@link CacheService#setFunctionality},
- * если планируется использовать методы {@link CacheService#doAction} или {@link
- * CacheService#hardUpdateCache}
+ * <p>Перед работой необходимо задать функции через метод {@link CacheIdService#setFunctionality},
+ * если планируется использовать методы {@link CacheIdService#doAction} или {@link
+ * CacheIdService#hardUpdateCache} (неявно используется функцией {@link CacheIdService#updateCache})
  *
  * @param <KeyT> параметр поиска
  * @param <EntityT> объект результатов поиска
- * @deprecated Заменено новой версией, корректно работающей с обновлением
+ * @param <IdT> тип id, получаемого из объекта
  */
-public class CacheService<KeyT, EntityT> {
+public class CacheIdService<KeyT, EntityT, IdT> {
   private final Long cacheMaxSize;
   private final Short clearPercentage;
-  private final HashMap<KeyT, Set<EntityT>> cache = new HashMap<>();
+  private final HashMap<KeyT, Set<IdT>> cache = new HashMap<>();
   private final Queue<KeyT> history = new LinkedList<>();
-  private final HashMap<EntityT, Set<KeyT>> linkRepository = new HashMap<>();
+  private final HashMap<IdT, Set<KeyT>> linkRepository = new HashMap<>();
+  private final HashMap<IdT, EntityT> entityRepository = new HashMap<>();
 
+  private final Function<EntityT, IdT> getId;
   private Function<KeyT, Set<EntityT>> cacheableAction;
   private BiFunction<KeyT, EntityT, Boolean> isPairValid;
 
-  private static final Logger logger = LoggerFactory.getLogger(CacheService.class);
+  // TODO remove debug objects
+  private static final Logger logger = LoggerFactory.getLogger(CacheIdService.class);
   private static final ObjectMapper mapper = new ObjectMapper();
 
   /** Перечисление для указания причины {@link #updateCache}. */
@@ -49,19 +51,20 @@ public class CacheService<KeyT, EntityT> {
   }
 
   /** Конструктор для задания настроек класса. */
-  public CacheService(long sizeOfCache, short clearPercentage) {
+  public CacheIdService(Function<EntityT, IdT> getIdFunc, long sizeOfCache, short clearPercentage) {
     if (clearPercentage < 1 || clearPercentage > 100) {
       throw new RuntimeException("Clear percentage in CacheService must be between 1 and 100");
     }
     this.cacheMaxSize = sizeOfCache;
     this.clearPercentage = clearPercentage;
+    this.getId = getIdFunc;
     logger.debug("Object created");
   }
 
   /** Задание опциональных полей класса. */
   public void setFunctionality(
-      Function<KeyT, Set<EntityT>> cacheableAction,
-      BiFunction<KeyT, EntityT, Boolean> isPairValid) {
+          Function<KeyT, Set<EntityT>> cacheableAction,
+          BiFunction<KeyT, EntityT, Boolean> isPairValid) {
     this.cacheableAction = cacheableAction;
     this.isPairValid = isPairValid;
     logger.debug("Functionality set");
@@ -83,9 +86,8 @@ public class CacheService<KeyT, EntityT> {
     logger.debug("Cache miss");
     Set<EntityT> actionResult = cacheableAction.apply(argument);
     if (isResultCaching) {
-      logger.debug("Try add cache");
+      logger.debug("Add cache");
       addCache(argument, actionResult);
-      logger.debug("End adding cache");
     }
     return actionResult;
   }
@@ -104,12 +106,15 @@ public class CacheService<KeyT, EntityT> {
    * @return значение из кэша по параметру поиска, иначе {@code Optional.empty()}
    */
   public Optional<Set<EntityT>> getCachedAction(KeyT argument) {
-    Set<EntityT> result = cache.get(argument);
-    if (result == null) {
+    Set<IdT> resultInner = cache.get(argument);
+    Set<EntityT> result = new HashSet<>();
+    if (resultInner == null) {
       return Optional.empty();
-    } else {
-      return Optional.of(result);
     }
+    for (var resItem : resultInner) {
+      result.add(entityRepository.get(resItem));
+    }
+    return Optional.of(result);
   }
 
   /**
@@ -122,18 +127,16 @@ public class CacheService<KeyT, EntityT> {
    * </ul>
    */
   public void addCache(KeyT key, Set<EntityT> results) {
-    Set<EntityT> resultsCopy = new HashSet<>(results);
     trimCacheIfFull();
+    Set<IdT> resultsCopy = new HashSet<>();
+    for (EntityT resItem : results) {
+      IdT id = getId.apply(resItem);
+      resultsCopy.add(id);
+      entityRepository.put(id, resItem);
+      linkRepository.computeIfAbsent(id, k -> new HashSet<>()).add(key);
+    }
     cache.put(key, resultsCopy);
     history.add(key);
-    addCacheLinks(key, resultsCopy);
-  }
-
-  /** Добавление ссылок от объектов к ключам, результат которых их содержит. */
-  private void addCacheLinks(KeyT key, Set<EntityT> results) {
-    for (EntityT result : results) {
-      linkRepository.computeIfAbsent(result, k -> new HashSet<>()).add(key);
-    }
   }
 
   /**
@@ -141,49 +144,48 @@ public class CacheService<KeyT, EntityT> {
    *
    * <p>Значения из {@link UpdateReason} соответствуют операциям в БД.
    *
-   * @param includeKeysWithoutEntity флаг, отвечающий за соотношение жёсткости и скорости
-   *     актуализации кэша
+   * @param includeKeysWithoutEntity флаг, отвечающий за жёсткость актуализации кэша
    */
   public void updateCache(
-      EntityT entity, UpdateReason updateReason, boolean includeKeysWithoutEntity) {
+          EntityT entity, UpdateReason updateReason, boolean includeKeysWithoutEntity) {
     logger.debug("Entry to updating cache, reason: {}", updateReason.toString());
     logger.debug("Entity - {}", entity.toString());
-    logger.debug(
-        "Data: \nCache - {}\nHistory - {}\nLinks - {}",
-        cache.toString(),
-        history.toString(),
-        linkRepository.toString());
+    logger.debug("Data: \nCache - {}\nHistory - {}\nLinks - {}\nEntities - {}", cache, history, linkRepository, entityRepository);
+    // init
+    IdT entityId = getId.apply(entity);
     Set<KeyT> baseKeys = new HashSet<>(cache.keySet());
-    Set<KeyT> possibleConflictKeys = new HashSet<>();
-    if (linkRepository.containsKey(entity)) {
-      logger.debug("Find such entity in reverse cache");
-      possibleConflictKeys = linkRepository.get(entity);
-    } else {
-      logger.debug("Not found such entity in reverse cache");
-    }
-    for (KeyT key : possibleConflictKeys) {
-      logger.debug("Entry to current key (possible conflict): {}", key.toString());
-      boolean shouldKeep =
-          (updateReason != UpdateReason.ENTITY_DELETED && isPairValid.apply(key, entity));
-      if (!shouldKeep) {
-        logger.debug("Remove entity");
-        cache.get(key).remove(entity);
-        linkRepository.get(entity).remove(key);
+    if (linkRepository.containsKey(entityId)) { logger.debug("Reverse cache with such id found"); }
+    else { logger.debug("Reverse cache with such id NOT found"); }
+    Set<KeyT> possibleConflictKeys = new HashSet<>(linkRepository.computeIfAbsent(entityId, k->new HashSet<>())); // TODO wrong
+    // keys with entity
+    for (KeyT key : possibleConflictKeys) {  logger.debug("Entry to current key (possible conflict): {}", key.toString());
+      boolean shouldKeepPair =
+              (updateReason != UpdateReason.ENTITY_DELETED && isPairValid.apply(key, entity));
+      if (!shouldKeepPair) {  logger.debug("Remove entity");
+        cache.get(key).remove(entityId);
+        linkRepository.get(entityId).remove(key);
       }
       baseKeys.remove(key);
     }
-    if (includeKeysWithoutEntity && updateReason != UpdateReason.ENTITY_DELETED) {
-      for (KeyT key : baseKeys) {
-        logger.debug("Entry to current key (without entity): {}", key.toString());
-        if (isPairValid.apply(key, entity)) {
-          logger.debug("Add entity");
-          cache.get(key).add(entity);
-          linkRepository.computeIfAbsent(entity, k -> new HashSet<>()).add(key);
+    // keys without entity
+    if (updateReason == UpdateReason.ENTITY_DELETED) {
+      linkRepository.remove(entityId);
+      entityRepository.remove(entityId);
+    } else if (includeKeysWithoutEntity) {
+      for (KeyT key : baseKeys) { logger.debug("Entry to current key (without entity): {}", key.toString());
+        if (isPairValid.apply(key, entity)) { logger.debug("Add entity");
+          cache.get(key).add(entityId);
+          linkRepository.computeIfAbsent(entityId, en -> new HashSet<>()).add(key);
         }
       }
     }
-    if (updateReason == UpdateReason.ENTITY_DELETED) {
-      linkRepository.remove(entity);
+    // final
+    switch (updateReason) {
+      case ENTITY_ADDED, ENTITY_EDITED:
+        entityRepository.put(entityId, entity);
+        break;
+      case ENTITY_DELETED:
+        entityRepository.remove(entityId);
     }
   }
 
@@ -215,8 +217,8 @@ public class CacheService<KeyT, EntityT> {
       if (cleaningKey == null) {
         throw new NullPointerException("Cache element in history is null");
       }
-      Set<EntityT> updatedLinks = cache.get(cleaningKey);
-      for (EntityT linkKey : updatedLinks) {
+      Set<IdT> updatedLinks = cache.get(cleaningKey);
+      for (IdT linkKey : updatedLinks) {
         linkRepository.get(linkKey).remove(cleaningKey);
       }
       cache.remove(cleaningKey);
