@@ -19,19 +19,20 @@ public class EntityMapperTests {
 
   Group createTestGroup() {
     Long groupId = 15L;
-    String groupName = "group name", groupDescription = "group description";
+    String groupName = "group name";
+    String groupDescription = "group description";
     Group group = new Group(groupName, groupDescription);
     group.setId(groupId);
     return group;
   }
   @Test
-  public void groupToIdDto_whenGroupValid_returnsNotNullDtoFields() {
+  public void shouldReturnDtoHasNoNullFieldsWhenGroupIsValid() {
     Group group = createTestGroup();
     GroupIdDto groupIdDto = entityMapper.groupToIdDto(group);
     assertThat(groupIdDto).hasNoNullFieldsOrProperties();
   }
   @Test
-  public void groupToIdDto_whenGroupValid_returnsDto() {
+  public void shouldReturnEqualDtoWhenGroupIsValid() {
     Group group = createTestGroup();
     GroupIdDto groupIdDto = entityMapper.groupToIdDto(group);
     assertThat(groupIdDto)
@@ -41,7 +42,7 @@ public class EntityMapperTests {
   }
 
   @Test
-  public void groupToIdDto_whenGroupIsNull_returnsNull() {
+  public void shouldReturnNullWhenGroupIsNull() {
     Group group = null;
     GroupIdDto groupIdDto = entityMapper.groupToIdDto(group);
     assertNull(groupIdDto);
