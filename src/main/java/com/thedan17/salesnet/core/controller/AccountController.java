@@ -6,6 +6,7 @@ import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
 import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.service.AccountService;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
+import com.thedan17.salesnet.exception.ExceptionCommonLiterals;
 import com.thedan17.salesnet.exception.InvalidRequestBodyException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Контроллер для запросов, связанных с таблицей аккаунтов. */
@@ -89,7 +88,7 @@ public class AccountController {
         .getAccountById(id)
         .map(infoDto -> ResponseEntity.status(HttpStatus.OK).body(infoDto))
         .orElseThrow(
-            () -> new ContentNotFoundException(String.format("Account ID=%s not exist", id)));
+            () -> new ContentNotFoundException(ExceptionCommonLiterals.accountNotExist(id)));
   }
 
   /**
@@ -112,7 +111,7 @@ public class AccountController {
         .getAccountGroups(id)
         .map(groupIdDtoMany -> ResponseEntity.status(HttpStatus.OK).body(groupIdDtoMany))
         .orElseThrow(
-            () -> new ContentNotFoundException(String.format("Account ID=%s not exist", id)));
+            () -> new ContentNotFoundException(ExceptionCommonLiterals.accountNotExist(id)));
   }
 
   /**
@@ -135,7 +134,7 @@ public class AccountController {
         .updateAccount(id, updatedAccount)
         .map(infoDto -> ResponseEntity.status(HttpStatus.OK).body(infoDto))
         .orElseThrow(
-            () -> new ContentNotFoundException(String.format("Account ID=%s not exist", id)));
+            () -> new ContentNotFoundException(ExceptionCommonLiterals.accountNotExist(id)));
   }
 
   /**
@@ -156,7 +155,7 @@ public class AccountController {
     if (Boolean.TRUE.equals(accountService.deleteAccount(id))) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {
-      throw new ContentNotFoundException(String.format("Account ID=%s not exist", id));
+      throw new ContentNotFoundException(ExceptionCommonLiterals.accountNotExist(id));
     }
   }
 }
