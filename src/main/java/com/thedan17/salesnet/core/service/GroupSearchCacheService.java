@@ -29,14 +29,13 @@ public class GroupSearchCacheService {
   /** Настройка функциональных частей кэша. */
   private void setCacheFunctionality() {
     // all cache
-    Function<String, Set<Group>> searchAllFunction =
-        (arg) -> groupSearchRepository.findByNameSubstringJpql(arg);
+    Function<String, Set<Group>> searchAllFunction = groupSearchRepository::findByNameSubstringJpql;
     BiFunction<String, Group, Boolean> isValidAllFunction =
         (arg, res) -> res.getName().contains(arg);
     byNameFromAllCache.setFunctionality(searchAllFunction, isValidAllFunction);
     // acc cache
     Function<Pair<String, Long>, Set<Group>> searchAccFunction =
-        (arg) -> groupSearchRepository.findByNameInAccJpql(arg.getFirst(), arg.getSecond());
+        arg -> groupSearchRepository.findByNameInAccJpql(arg.getFirst(), arg.getSecond());
     BiFunction<Pair<String, Long>, Group, Boolean> isValidAccFunction =
         (pair, res) -> {
           if (isValidAllFunction.apply(pair.getFirst(), res)) {
