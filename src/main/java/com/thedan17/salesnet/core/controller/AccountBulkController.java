@@ -1,6 +1,7 @@
 package com.thedan17.salesnet.core.controller;
 
 import com.thedan17.salesnet.core.object.data.BulkOperationResult;
+import com.thedan17.salesnet.core.object.data.BulkOperationResultDetailed;
 import com.thedan17.salesnet.core.object.dto.AccountLoginDto;
 import com.thedan17.salesnet.core.service.AccountBulkService;
 import com.thedan17.salesnet.util.BulkResultResponseFactory;
@@ -33,7 +34,7 @@ public class AccountBulkController {
    *
    * @see AccountBulkService#addAccountsBulk(List)
    */
-  /*@Operation(
+  @Operation(
       summary = "Создать множество аккаунтов",
       description =
           "Возвращает структуру, отображающую успешные и неуспешные по обработке элементы")
@@ -43,9 +44,9 @@ public class AccountBulkController {
     @ApiResponse(responseCode = "400", description = "Ни один элемент не был обработан успешно")
   })
   @PostMapping("/accounts/bulk")
-  ResponseEntity<BulkOperationResult> addAccountsBulk(
+  ResponseEntity<BulkOperationResultDetailed> addAccountsBulk(
      @RequestBody List<AccountLoginDto> accountsData) {
-     BulkOperationResult addAccountsResult = accountBulkService.addAccountsBulk(accountsData);
+    BulkOperationResultDetailed addAccountsResult = accountBulkService.addAccountsBulk(accountsData);
     return BulkResultResponseFactory.fromResult(addAccountsResult);
-  }*/
+  }
 }

@@ -45,7 +45,7 @@ public class BulkOperationResultDetailed {
     this.addResult(bulkElementResult, true);
   }
 
-  public static <itemTypeT> BulkElementResult createResult(long index, itemTypeT item, Function<itemTypeT, List<BulkElementError>> processor) {
+  public static <T> BulkElementResult createResult(long index, T item, Function<T, List<BulkElementError>> processor) {
     List<BulkElementError> processorResult = processor.apply(item);
     BulkElementResult result = new BulkElementResult();
     result.index = index;
