@@ -8,6 +8,7 @@ import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +45,7 @@ public class AppLoggerCore {
         Files.createDirectories(logDirPath);
       } catch (IOException e) {
         basicLogger.error("AppLoggerCore couldn't be initialized, exception '{}'", e.toString());
-        throw new RuntimeException("Fatal: Logging initialization failed", e);
+        throw new UncheckedIOException("Fatal: Logging app component initialization failed because path not reachable", e);
       }
     }
     RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<>();
