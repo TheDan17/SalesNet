@@ -23,8 +23,6 @@ public class AppLogEnricher {
   @Autowired @Lazy
   AppLoggerCore logger;
 
-  // private static final Logger logger = LoggerFactory.getLogger(AppLogEnricher.class);
-
   /** Конструктор, задающий вручную сокращения для пакетов. */
   public AppLogEnricher(AppLoggerCore logger) {
     this.logger = logger;
