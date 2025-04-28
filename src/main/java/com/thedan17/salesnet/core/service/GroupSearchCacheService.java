@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -30,15 +31,15 @@ public class GroupSearchCacheService {
   private void setCacheFunctionality() {
     // all cache
     Function<String, Set<Group>> searchAllFunction = groupSearchRepository::findByNameSubstringJpql;
-    BiFunction<String, Group, Boolean> isValidAllFunction =
+    BiPredicate<String, Group> isValidAllFunction =
         (arg, res) -> res.getName().contains(arg);
     byNameFromAllCache.setFunctionality(searchAllFunction, isValidAllFunction);
     // acc cache
     Function<Pair<String, Long>, Set<Group>> searchAccFunction =
         arg -> groupSearchRepository.findByNameInAccJpql(arg.getFirst(), arg.getSecond());
-    BiFunction<Pair<String, Long>, Group, Boolean> isValidAccFunction =
+    BiPredicate<Pair<String, Long>, Group> isValidAccFunction =
         (pair, res) -> {
-          if (isValidAllFunction.apply(pair.getFirst(), res)) {
+          if (isValidAllFunction.test(pair.getFirst(), res)) {
             return accGroupLinkRepository
                 .findByAccountIdAndGroupId(pair.getSecond(), res.getId())
                 .isPresent();

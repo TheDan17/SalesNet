@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
 
   private final Function<EntityT, IdT> getId;
   private Function<KeyT, Set<EntityT>> cacheableAction;
-  private BiFunction<KeyT, EntityT, Boolean> isPairValid;
+  private BiPredicate<KeyT, EntityT> isPairValid;
 
   // TODO remove debug objects
   private static final Logger logger = LoggerFactory.getLogger(CacheIdManager.class);
@@ -63,7 +64,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
   /** Задание опциональных полей класса. */
   public void setFunctionality(
       Function<KeyT, Set<EntityT>> cacheableAction,
-      BiFunction<KeyT, EntityT, Boolean> isPairValid) {
+      BiPredicate<KeyT, EntityT> isPairValid) {
     this.cacheableAction = cacheableAction;
     this.isPairValid = isPairValid;
     logger.debug("Functionality set");
@@ -169,7 +170,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
     for (KeyT key : possibleConflictKeys) {
       logger.debug("Entry to current key (possible conflict): {}", key.toString());
       boolean shouldKeepPair =
-          (updateReason != UpdateReason.ENTITY_DELETED && isPairValid.apply(key, entity));
+          (updateReason != UpdateReason.ENTITY_DELETED && isPairValid.test(key, entity));
       if (!shouldKeepPair) {
         logger.debug("Remove entity");
         cache.get(key).remove(entityId);
@@ -184,7 +185,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
     } else if (includeKeysWithoutEntity) {
       for (KeyT key : baseKeys) {
         logger.debug("Entry to current key (without entity): {}", key.toString());
-        if (isPairValid.apply(key, entity)) {
+        if (isPairValid.test(key, entity)) {
           logger.debug("Add entity");
           cache.get(key).add(entityId);
           linkRepository.computeIfAbsent(entityId, en -> new HashSet<>()).add(key);
