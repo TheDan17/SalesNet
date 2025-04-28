@@ -7,11 +7,11 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Класс для хранения и последующего обновления кэша.
@@ -23,25 +23,23 @@ import org.slf4j.LoggerFactory;
  * если планируется использовать методы {@link CacheIdManager#doAction} или {@link
  * CacheIdManager#hardUpdateCache} (неявно используется функцией {@link CacheIdManager#updateCache})
  *
- * @param <KeyT> параметр поиска
- * @param <EntityT> объект результатов поиска
- * @param <IdT> тип id, получаемого из объекта
+ * @param <K> параметр поиска
+ * @param <C> объект результатов поиска
+ * @param <I> тип id, получаемого из объекта
  */
-public class CacheIdManager<KeyT, EntityT, IdT> {
+public class CacheIdManager<K, C, I> {
   private final Long cacheMaxSize;
   private final Short clearPercentage;
-  private final HashMap<KeyT, Set<IdT>> cache = new HashMap<>();
-  private final Queue<KeyT> history = new LinkedList<>();
-  private final HashMap<IdT, Set<KeyT>> linkRepository = new HashMap<>();
-  private final HashMap<IdT, EntityT> entityRepository = new HashMap<>();
+  private final HashMap<K, Set<I>> cache = new HashMap<>();
+  private final Queue<K> history = new LinkedList<>();
+  private final HashMap<I, Set<K>> linkRepository = new HashMap<>();
+  private final HashMap<I, C> entityRepository = new HashMap<>();
 
-  private final Function<EntityT, IdT> getId;
-  private Function<KeyT, Set<EntityT>> cacheableAction;
-  private BiPredicate<KeyT, EntityT> isPairValid;
+  private final Function<C, I> getId;
+  private Function<K, Set<C>> cacheableAction;
+  private BiPredicate<K, C> isPairValid;
 
-  // TODO remove debug objects
-  private static final Logger logger = LoggerFactory.getLogger(CacheIdManager.class);
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private final AppLoggerCore logger = new AppLoggerCore();
 
   /** Перечисление для указания причины {@link #updateCache}. */
   public enum UpdateReason {
@@ -51,20 +49,20 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
   }
 
   /** Конструктор для задания настроек класса. */
-  public CacheIdManager(Function<EntityT, IdT> getIdFunc, long sizeOfCache, short clearPercentage) {
+  public CacheIdManager(Function<C, I> getIdFunc, long sizeOfCache, short clearPercentage) {
     if (clearPercentage < 1 || clearPercentage > 100) {
       throw new RuntimeException("Clear percentage in CacheIdManager must be between 1 and 100");
     }
     this.cacheMaxSize = sizeOfCache;
     this.clearPercentage = clearPercentage;
     this.getId = getIdFunc;
-    logger.debug("Object created");
+    this.logger.debug("Object created");
   }
 
   /** Задание опциональных полей класса. */
   public void setFunctionality(
-      Function<KeyT, Set<EntityT>> cacheableAction,
-      BiPredicate<KeyT, EntityT> isPairValid) {
+      Function<K, Set<C>> cacheableAction,
+      BiPredicate<K, C> isPairValid) {
     this.cacheableAction = cacheableAction;
     this.isPairValid = isPairValid;
     logger.debug("Functionality set");
@@ -75,16 +73,16 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
    *
    * @param isResultCaching влияет на то, сохранятся ли полученные данные в кэш при их отсутствии
    */
-  public Set<EntityT> doAction(KeyT argument, boolean isResultCaching) {
+  public Set<C> doAction(K argument, boolean isResultCaching) {
     logger.debug("Entry doAction");
     logger.debug("Key argument: {}", argument.toString());
-    Optional<Set<EntityT>> cacheResult = getCachedAction(argument);
+    Optional<Set<C>> cacheResult = getCachedAction(argument);
     if (cacheResult.isPresent()) {
       logger.debug("Cache hit");
       return cacheResult.get();
     }
     logger.debug("Cache miss");
-    Set<EntityT> actionResult = cacheableAction.apply(argument);
+    Set<C> actionResult = cacheableAction.apply(argument);
     if (isResultCaching) {
       logger.debug("Add cache");
       addCache(argument, actionResult);
@@ -96,7 +94,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
    * Перегрузка для {@link #doAction(Object, boolean)}, когда кэширование отсутствующего результата
    * подразумевается по умолчанию.
    */
-  public Set<EntityT> doAction(KeyT argument) {
+  public Set<C> doAction(K argument) {
     return doAction(argument, true);
   }
 
@@ -105,9 +103,9 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
    *
    * @return значение из кэша по параметру поиска, иначе {@code Optional.empty()}
    */
-  public Optional<Set<EntityT>> getCachedAction(KeyT argument) {
-    Set<IdT> resultInner = cache.get(argument);
-    Set<EntityT> result = new HashSet<>();
+  public Optional<Set<C>> getCachedAction(K argument) {
+    Set<I> resultInner = cache.get(argument);
+    Set<C> result = new HashSet<>();
     if (resultInner == null) {
       return Optional.empty();
     }
@@ -126,11 +124,11 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
    *   <li>Помимо самих записей добавляет быстрые ссылки на ключи, которые будут содержать значения
    * </ul>
    */
-  public void addCache(KeyT key, Set<EntityT> results) {
+  public void addCache(K key, Set<C> results) {
     trimCacheIfFull();
-    Set<IdT> resultsCopy = new HashSet<>();
-    for (EntityT resItem : results) {
-      IdT id = getId.apply(resItem);
+    Set<I> resultsCopy = new HashSet<>();
+    for (C resItem : results) {
+      I id = getId.apply(resItem);
       resultsCopy.add(id);
       entityRepository.put(id, resItem);
       linkRepository.computeIfAbsent(id, k -> new HashSet<>()).add(key);
@@ -147,7 +145,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
    * @param includeKeysWithoutEntity флаг, отвечающий за жёсткость актуализации кэша
    */
   public void updateCache(
-      EntityT entity, UpdateReason updateReason, boolean includeKeysWithoutEntity) {
+          C entity, UpdateReason updateReason, boolean includeKeysWithoutEntity) {
     logger.debug("Entry to updating cache, reason: {}", updateReason.toString());
     logger.debug("Entity - {}", entity.toString());
     logger.debug(
@@ -157,17 +155,17 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
         linkRepository,
         entityRepository);
     // init
-    IdT entityId = getId.apply(entity);
-    Set<KeyT> baseKeys = new HashSet<>(cache.keySet());
+    I entityId = getId.apply(entity);
+    Set<K> baseKeys = new HashSet<>(cache.keySet());
     if (linkRepository.containsKey(entityId)) {
       logger.debug("Reverse cache with such id found");
     } else {
       logger.debug("Reverse cache with such id NOT found");
     }
-    Set<KeyT> possibleConflictKeys =
+    Set<K> possibleConflictKeys =
         new HashSet<>(linkRepository.computeIfAbsent(entityId, k -> new HashSet<>())); // TODO wrong
     // keys with entity
-    for (KeyT key : possibleConflictKeys) {
+    for (K key : possibleConflictKeys) {
       logger.debug("Entry to current key (possible conflict): {}", key.toString());
       boolean shouldKeepPair =
           (updateReason != UpdateReason.ENTITY_DELETED && isPairValid.test(key, entity));
@@ -183,7 +181,7 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
       linkRepository.remove(entityId);
       entityRepository.remove(entityId);
     } else if (includeKeysWithoutEntity) {
-      for (KeyT key : baseKeys) {
+      for (K key : baseKeys) {
         logger.debug("Entry to current key (without entity): {}", key.toString());
         if (isPairValid.test(key, entity)) {
           logger.debug("Add entity");
@@ -205,12 +203,12 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
   }
 
   /** Перегрузка для значения по умолчанию у {@link #updateCache(Object, UpdateReason, boolean)}. */
-  public void softUpdateCache(EntityT group, UpdateReason updateReason) {
+  public void softUpdateCache(C group, UpdateReason updateReason) {
     updateCache(group, updateReason, false);
   }
 
   /** Перегрузка для значения по умолчанию у {@link #updateCache(Object, UpdateReason, boolean)}. */
-  public void hardUpdateCache(EntityT group, UpdateReason updateReason) {
+  public void hardUpdateCache(C group, UpdateReason updateReason) {
     updateCache(group, updateReason, true);
   }
 
@@ -228,12 +226,12 @@ public class CacheIdManager<KeyT, EntityT, IdT> {
       if (history.isEmpty()) {
         throw new RuntimeException("Cache overflow clear is running despite cache is empty");
       }
-      KeyT cleaningKey = history.poll();
+      K cleaningKey = history.poll();
       if (cleaningKey == null) {
         throw new NullPointerException("Cache element in history is null");
       }
-      Set<IdT> updatedLinks = cache.get(cleaningKey);
-      for (IdT linkKey : updatedLinks) {
+      Set<I> updatedLinks = cache.get(cleaningKey);
+      for (I linkKey : updatedLinks) {
         linkRepository.get(linkKey).remove(cleaningKey);
       }
       cache.remove(cleaningKey);
