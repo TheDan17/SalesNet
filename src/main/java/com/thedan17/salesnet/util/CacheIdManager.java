@@ -51,7 +51,7 @@ public class CacheIdManager<K, C, I> {
   /** Конструктор для задания настроек класса. */
   public CacheIdManager(Function<C, I> getIdFunc, long sizeOfCache, short clearPercentage) {
     if (clearPercentage < 1 || clearPercentage > 100) {
-      throw new RuntimeException("Clear percentage in CacheIdManager must be between 1 and 100");
+      throw new IllegalArgumentException("Clear percentage in CacheIdManager must be between 1 and 100");
     }
     this.cacheMaxSize = sizeOfCache;
     this.clearPercentage = clearPercentage;
@@ -163,7 +163,7 @@ public class CacheIdManager<K, C, I> {
       logger.debug("Reverse cache with such id NOT found");
     }
     Set<K> possibleConflictKeys =
-        new HashSet<>(linkRepository.computeIfAbsent(entityId, k -> new HashSet<>())); // TODO wrong
+        new HashSet<>(linkRepository.computeIfAbsent(entityId, k -> new HashSet<>()));
     // keys with entity
     for (K key : possibleConflictKeys) {
       logger.debug("Entry to current key (possible conflict): {}", key.toString());
@@ -224,7 +224,7 @@ public class CacheIdManager<K, C, I> {
     long targetCacheSize = (long) (cacheMaxSize * ((100.0 - clearPercentage) / 100.0));
     while (cache.size() > targetCacheSize) {
       if (history.isEmpty()) {
-        throw new RuntimeException("Cache overflow clear is running despite cache is empty");
+        throw new IllegalStateException("Cache overflow clear is running despite cache is empty");
       }
       K cleaningKey = history.poll();
       if (cleaningKey == null) {
@@ -247,7 +247,7 @@ public class CacheIdManager<K, C, I> {
     if (cache.size() >= cacheMaxSize) {
       trimCache();
       if (cache.size() >= cacheMaxSize) {
-        throw new RuntimeException("Cache clearance failed when handling overflow");
+        throw new IllegalStateException("Cache clearance failed when handling overflow");
       }
     }
   }
