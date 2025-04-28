@@ -7,6 +7,11 @@ import org.springframework.http.ResponseEntity;
 
 /** Утилита формирования ответов для различных {@code Bulk*Result}. */
 public class BulkResultResponseFactory {
+
+  private BulkResultResponseFactory() {
+    // for preventing bad usage
+  }
+
   /**
    * Метод формирования кода ответа в зависимости от количества успешных элементов bulk операции.
    */
