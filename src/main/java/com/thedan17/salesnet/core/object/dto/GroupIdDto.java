@@ -30,5 +30,5 @@ public class GroupIdDto {
   @Schema(
       description =
           "ID аккаунта, который владеет группой (может меняться по желанию текущего владельца)")
-  private Long ownerId;
+  private Long ownerId = (long) -1;
 }
