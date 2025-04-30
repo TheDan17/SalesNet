@@ -13,6 +13,11 @@ public class PasswordCheckUtil {
           "asdfghjkl", "lkjhgfdsa",
           "zxcvbnm", "mnbvcxz");
 
+  /** Переопределение дефолтного конструктора приватным для утилитного класса. */
+  private PasswordCheckUtil() {
+    // for preventing bad usage
+  }
+
   public static boolean containsUpperCase(String password) {
     return password != null && UPPERCASE.matcher(password).find();
   }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 /** Утилита формирования ответов для различных {@code Bulk*Result}. */
 public class BulkResultResponseFactory {
 
+  /** Переопределение дефолтного конструктора приватным для утилитного класса. */
   private BulkResultResponseFactory() {
     // for preventing bad usage
   }

@@ -14,6 +14,11 @@ public class AccountLoginDtoValidator {
   @SuppressWarnings("resource")
   private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
+  /** Переопределение дефолтного конструктора приватным для утилитного класса. */
+  private AccountLoginDtoValidator() {
+    // for preventing bad usage
+  }
+
   /** Валидация {@link AccountSignupDto} согласно правилам аннотации {@link Schema}. */
   public static List<ValidationError> validate(AccountSignupDto dto) {
     Set<ConstraintViolation<AccountSignupDto>> violations = validator.validate(dto);

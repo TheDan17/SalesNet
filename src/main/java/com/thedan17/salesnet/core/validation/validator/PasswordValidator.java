@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PasswordValidator {
+
+  /** Переопределение дефолтного конструктора приватным для утилитного класса. */
+  private PasswordValidator() {
+    // for preventing bad usage
+  }
+
   public static List<ValidationError> validate(String password) {
     List<ValidationError> errors = new ArrayList<>();
     if (!PasswordCheckUtil.haveEnoughLength(password)) {
