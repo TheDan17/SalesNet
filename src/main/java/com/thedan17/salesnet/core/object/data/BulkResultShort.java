@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class BulkResultShort {
-  private BulkResultShort.BulkStatus status;
   private Integer successElements;
   private Integer failureElements;
 
@@ -14,13 +13,13 @@ public class BulkResultShort {
     TOTAL_FAILURE
   }
 
-  public void makeStatus() {
+  public BulkStatus getStatus() {
     if (successElements.equals(0)) {
-      this.status = BulkStatus.TOTAL_FAILURE;
+      return BulkStatus.TOTAL_FAILURE;
     } else if (failureElements.equals(0)) {
-      this.status = BulkStatus.ALL_SUCCESS;
+      return BulkStatus.ALL_SUCCESS;
     } else {
-      this.status = BulkStatus.MULTI_STATUS;
+      return BulkStatus.MULTI_STATUS;
     }
   }
 }
