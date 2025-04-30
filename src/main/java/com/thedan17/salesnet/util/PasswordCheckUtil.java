@@ -33,7 +33,7 @@ public class PasswordCheckUtil {
    * @return true, если пароль состоит исключительно из латинских A-Z/a-z, цифр 0-9 и символа _
    */
   public static boolean containsOnlyAllowedChars(String password) {
-    return password != null && password.matches("^[A-Za-z0-9_]+$");
+    return password != null && password.matches("^\\W+$");
   }
 
   public static boolean haveEnoughLength(String password){
@@ -65,7 +65,8 @@ public class PasswordCheckUtil {
       return false;
     }
 
-    int incRun = 1, decRun = 1;
+    int incRun = 1;
+    int decRun = 1;
     for (int i = 1; i < password.length(); i++) {
       char prev = password.charAt(i - 1);
       char curr = password.charAt(i);
