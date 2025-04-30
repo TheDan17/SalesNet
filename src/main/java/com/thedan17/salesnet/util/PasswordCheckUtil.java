@@ -1,24 +1,28 @@
 package com.thedan17.salesnet.util;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class PasswordCheckUtil {
   public static final short REQUIRED_PASSWORD_LENGTH = 8;
+  private static final Pattern UPPERCASE = Pattern.compile("[A-Z]");
+  private static final Pattern LOWERCASE = Pattern.compile("[a-z]");
+  private static final Pattern DIGIT = Pattern.compile("\\d");
   public static final List<String> KEY_ROWS = List.of(
           "qwertyuiop", "poiuytrewq",
           "asdfghjkl", "lkjhgfdsa",
           "zxcvbnm", "mnbvcxz");
 
-  public static boolean containsDigit(String password) {
-    return password != null && password.matches(".*\\d.*");
+  public static boolean containsUpperCase(String password) {
+    return password != null && UPPERCASE.matcher(password).find();
   }
 
   public static boolean containsLowerCase(String password) {
-    return password != null && password.matches(".*[a-z].*");
+    return password != null && LOWERCASE.matcher(password).find();
   }
 
-  public static boolean containsUpperCase(String password) {
-    return password != null && password.matches(".*[A-Z].*");
+  public static boolean containsDigit(String password) {
+    return password != null && DIGIT.matcher(password).find();
   }
 
   public static boolean doesNotContainRepeatedChars(String password) {
