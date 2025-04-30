@@ -27,8 +27,8 @@ public class CommonUtilTests {
     matches.add("71a631c26669714ea79a98c183253778f2b4488f41ef08fe79cdbe4939b91b6e");
     matches.add("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
     List<String> finalSources = sources.stream().map(CommonUtil::hashWithSha256).toList();
-    IntStream.range(0, finalSources.size()).forEach(i -> {
-            assertEquals(finalSources.get(i), matches.get(i));
-    });
+    IntStream.range(0, finalSources.size()).forEach(i ->
+            assertEquals(finalSources.get(i), matches.get(i))
+    );
   }
 }
