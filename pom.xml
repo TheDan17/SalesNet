@@ -122,7 +122,8 @@
 							<version>1.5.5.Final</version>
 						</path>
 					</annotationProcessorPaths>
-				</configuration>
+                    <compilerArgs>--enable-preview</compilerArgs>
+                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
