@@ -52,9 +52,7 @@ public class AccountBulkService {
                   BulkResultDetailed.createResult(dtoIndex, dto, AccountLoginDtoValidator::validate)
               );
             })
-            .peek(pair -> {
-              processResult.addResult(pair.getSecond());
-            })
+            .peek(pair -> processResult.addResult(pair.getSecond()))
             .filter(pair ->
                     pair.getSecond().getStatus() == BulkResultDetailed.BulkElementStatus.SUCCESS)
             .forEach(pair -> {
