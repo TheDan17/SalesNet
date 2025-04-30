@@ -2,7 +2,7 @@ package com.thedan17.salesnet.util;
 
 import com.thedan17.salesnet.core.object.dto.AccGroupLinkDto;
 import com.thedan17.salesnet.core.object.dto.AccountInfoDto;
-import com.thedan17.salesnet.core.object.dto.AccountLoginDto;
+import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
 import com.thedan17.salesnet.core.object.dto.GroupCreateDto;
 import com.thedan17.salesnet.core.object.dto.GroupDto;
@@ -18,7 +18,7 @@ import org.mapstruct.Mapping;
 public interface EntityMapper {
 
   /** Перевод из AccountLogin в Account для POST запроса. */
-  Account loginDtoToAccount(AccountLoginDto accountLoginDto);
+  Account loginDtoToAccount(AccountSignupDto accountSignupDto);
 
   /** Перевод из Account в AccountInfo для GET запроса. */
   @Mapping(

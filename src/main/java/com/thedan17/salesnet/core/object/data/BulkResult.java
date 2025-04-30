@@ -1,15 +1,13 @@
 package com.thedan17.salesnet.core.object.data;
 
 import java.util.List;
-import java.util.Set;
 import lombok.Data;
 
 @Data
-public class BulkOperationResult {
-  Integer successElements;
-  Set<Integer> successIndexes;
-  Integer failureElements;
-  List<BulkProcessError> failureErrors;
+public class BulkResult {
+  private Integer successElements;
+  private Integer failureElements;
+  private List<BulkProcessError> failureErrors;
 
   @Data
   public static class BulkProcessError {

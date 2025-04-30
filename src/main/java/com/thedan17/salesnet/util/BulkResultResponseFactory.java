@@ -1,7 +1,6 @@
 package com.thedan17.salesnet.util;
 
-import com.thedan17.salesnet.core.object.data.BulkOperationResult;
-import com.thedan17.salesnet.core.object.data.BulkOperationResultDetailed;
+import com.thedan17.salesnet.core.object.data.BulkResultDetailed;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -15,7 +14,7 @@ public class BulkResultResponseFactory {
   /**
    * Метод формирования кода ответа в зависимости от количества успешных элементов bulk операции.
    */
-  public static ResponseEntity<BulkOperationResultDetailed> fromResult(BulkOperationResultDetailed result) {
+  public static ResponseEntity<BulkResultDetailed> fromResult(BulkResultDetailed result) {
     if (result.getFailureAmount() > 0 && result.getSuccessAmount() > 0) {
       return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(result);
     } else if (result.getSuccessAmount() == 0) {

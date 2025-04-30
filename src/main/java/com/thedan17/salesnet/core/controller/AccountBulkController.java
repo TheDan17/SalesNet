@@ -1,8 +1,7 @@
 package com.thedan17.salesnet.core.controller;
 
-import com.thedan17.salesnet.core.object.data.BulkOperationResult;
-import com.thedan17.salesnet.core.object.data.BulkOperationResultDetailed;
-import com.thedan17.salesnet.core.object.dto.AccountLoginDto;
+import com.thedan17.salesnet.core.object.data.BulkResultDetailed;
+import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.service.AccountBulkService;
 import com.thedan17.salesnet.util.BulkResultResponseFactory;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +27,6 @@ public class AccountBulkController {
     this.accountBulkService = accountBulkService;
   }
 
-
   /**
    * Массовое создание аккаунтов. Делегирует операцию {@link AccountBulkService}.
    *
@@ -44,9 +42,9 @@ public class AccountBulkController {
     @ApiResponse(responseCode = "400", description = "Ни один элемент не был обработан успешно")
   })
   @PostMapping("/accounts/bulk")
-  ResponseEntity<BulkOperationResultDetailed> addAccountsBulk(
-     @RequestBody List<AccountLoginDto> accountsData) {
-    BulkOperationResultDetailed addAccountsResult = accountBulkService.addAccountsBulk(accountsData);
+  ResponseEntity<BulkResultDetailed> addAccountsBulk(
+     @RequestBody List<AccountSignupDto> accountsData) {
+    BulkResultDetailed addAccountsResult = accountBulkService.addAccountsBulk(accountsData);
     return BulkResultResponseFactory.fromResult(addAccountsResult);
   }
 }

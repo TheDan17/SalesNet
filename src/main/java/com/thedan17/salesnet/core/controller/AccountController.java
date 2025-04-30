@@ -1,7 +1,7 @@
 package com.thedan17.salesnet.core.controller;
 
 import com.thedan17.salesnet.core.object.dto.AccountInfoDto;
-import com.thedan17.salesnet.core.object.dto.AccountLoginDto;
+import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
 import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.service.AccountService;
@@ -43,7 +43,7 @@ public class AccountController {
   /**
    * Создание нового пользователя. Делегирует вызов {@link AccountService}.
    *
-   * @see AccountService#addAccount(AccountLoginDto)
+   * @see AccountService#addAccount(AccountSignupDto)
    */
   @Operation(
       summary = "Создать аккаунт",
@@ -62,7 +62,7 @@ public class AccountController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PostMapping
-  public ResponseEntity<AccountInfoDto> createAccount(@RequestBody AccountLoginDto account) {
+  public ResponseEntity<AccountInfoDto> createAccount(@RequestBody AccountSignupDto account) {
     return accountService
         .addAccount(account)
         .map(infoDto -> ResponseEntity.status(HttpStatus.CREATED).body(infoDto))

@@ -1,6 +1,8 @@
 package com.thedan17.salesnet.core.object.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 
@@ -8,17 +10,38 @@ import lombok.experimental.FieldNameConstants;
 @Schema(description = "DTO для предоставления информации при регистрации аккаунта.")
 @Data
 @FieldNameConstants
-public class AccountLoginDto {
+public class AccountSignupDto {
   @Schema(description = "Уникальный буквенный идентификатор, желаемый пользователем")
+  @NotBlank
   private String login;
+
   @Schema(description = "E-mail, на который будут приходить служебного рода письма")
+  @Email
+  @NotBlank
   private String email;
-  @Schema(description = "Пароль, хэш которого будет использоваться для входа пользователя в будущий аккаунт")
+
+  @Schema(description = """
+        Пароль, хэш которого будет использоваться для входа пользователя в будущий аккаунт.
+        Должен соответствовать следующим требованиям:
+        - Длина 8 или более символов
+        - Только латинские символы, цифры и нижнее подчеркивание
+        - Хотя бы одна цифра
+        - Хотя бы одна прописная буква
+        - Хотя бы одна строчная буква
+        - Отсутствует последовательность, содержащую более трех символов типа 'qwerty'
+        - Отсутствует последовательность, содержащую более трех символов типа '123456'
+        """)
+  @NotBlank
   private String password;
+
   @Schema(description = "Имя, если физическое лицо, иначе поле для названия ИП/компании")
+  @NotBlank
   private String firstName;
+
   @Schema(description = "Фамилия, используется, только если это физическое лицо, иначе пустое поле")
   private String secondName;
+
   @Schema(description = "Тип аккаунта, который указывает на принадлежность к физ.лицу/ИП/ООО/ОАО")
+  @NotBlank
   private String type;
 }

@@ -1,5 +1,7 @@
 package com.thedan17.salesnet.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -32,4 +34,25 @@ public class CommonUtil {
       throw e;
     }
   }
+
+  /** Временный метод для хеширования пароля по методу SHA-256. */
+  public static String hashWithSha256(String data) {
+    MessageDigest digest;
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("No SHA-256 algorithm (with cause)", e);
+    }
+    byte[] hashBytes = digest.digest(data.getBytes());
+    StringBuilder hexString = new StringBuilder();
+    for (byte b : hashBytes) {
+      String hex = Integer.toHexString(0xff & b);
+      if (hex.length() == 1) {
+        hexString.append('0');
+      }
+      hexString.append(hex);
+    }
+    return hexString.toString();
+  }
+
 }
