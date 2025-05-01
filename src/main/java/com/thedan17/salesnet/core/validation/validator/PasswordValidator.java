@@ -49,7 +49,7 @@ public class PasswordValidator {
               "Password should contain at least one uppercase letter"
       ));
     }
-    if (!PasswordCheckUtil.doesNotContainKeyboardSequence(password)) {
+    if (!PasswordCheckUtil.doesNotContainSequences(password)) {
       errors.add(new ValidationError(
               AccountSignupDto.Fields.password,
               "Password should not contain sequences like 'qwerty'"

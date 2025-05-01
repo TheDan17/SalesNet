@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 public class PasswordCheckUtil {
   public static final short REQUIRED_PASSWORD_LENGTH = 8;
+  public static final short REQUIRED_SEQUENCE_LENGTH_DETECT = 3;
   private static final Pattern UPPERCASE = Pattern.compile("[A-Z]");
   private static final Pattern LOWERCASE = Pattern.compile("[a-z]");
   private static final Pattern DIGIT = Pattern.compile("\\d");
@@ -31,14 +32,17 @@ public class PasswordCheckUtil {
   }
 
   public static boolean doesNotContainRepeatedChars(String password) {
-    return password != null && !password.matches("(.)\\1{2,}");
+    if (password == null){
+      return true;
+    }
+    return !Pattern.compile("(.)\\1{2,}").matcher(password).find();
   }
 
   /**
    * @return true, если пароль состоит исключительно из латинских A-Z/a-z, цифр 0-9 и символа _
    */
   public static boolean containsOnlyAllowedChars(String password) {
-    return password != null && password.matches("^\\W+$");
+    return password != null && password.matches("^\\w+$");
   }
 
   public static boolean haveEnoughLength(String password){
@@ -51,7 +55,9 @@ public class PasswordCheckUtil {
    * @return true — если есть подпоследовательность длины ≥ seqLength
    */
   public static boolean containsKeyboardSequence(String password, int seqLength) {
-    if (password == null || password.length() < seqLength) return false;
+    if (password == null || password.length() < seqLength) {
+      return false;
+    }
     String lower = password.toLowerCase();
 
     for (String row : KEY_ROWS) {
@@ -69,6 +75,7 @@ public class PasswordCheckUtil {
     if (password == null || password.length() < seqLength) {
       return false;
     }
+    password = password.toLowerCase();
 
     int incRun = 1;
     int decRun = 1;
@@ -94,9 +101,9 @@ public class PasswordCheckUtil {
     return false;
   }
 
-  /** Запрещаем любые 4-символьные фрагменты. */
-  public static boolean doesNotContainKeyboardSequence(String password) {
-    return !containsKeyboardSequence(password, 3) &&
-            !containsNumericSequence(password, 3);
+  /** Запрещаем любые символьные фрагменты заданной длины. */
+  public static boolean doesNotContainSequences(String password) {
+    return !containsKeyboardSequence(password, REQUIRED_SEQUENCE_LENGTH_DETECT) &&
+            !containsNumericSequence(password, REQUIRED_SEQUENCE_LENGTH_DETECT);
   }
 }
