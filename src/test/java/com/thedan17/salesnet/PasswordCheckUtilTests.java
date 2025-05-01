@@ -16,12 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PasswordCheckUtilTests {
   private static Stream<Arguments> provideUppercaseTestData() {
     return Stream.of(
-      Arguments.of("Test", true),
-      Arguments.of("test", false),
-      Arguments.of("1234", false),
-      Arguments.of("hIkEr", true),
-      Arguments.of("pokeR", true),
-      Arguments.of("", false)
+            Arguments.of("Test", true),
+            Arguments.of("test", false),
+            Arguments.of("1234", false),
+            Arguments.of("hIkEr", true),
+            Arguments.of("pokeR", true),
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -39,7 +40,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("1234", false),
             Arguments.of("TEST", false),
             Arguments.of("REsT", true),
-            Arguments.of("", false)
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -57,7 +59,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("1234", true),
             Arguments.of("TEST3", true),
             Arguments.of("REs_ss#@5T", true),
-            Arguments.of("", false)
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -74,7 +77,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("LolQweRty", true),
             Arguments.of("mnbvcx102938", true),
             Arguments.of("qw_er_ty_12345678", false),
-            Arguments.of("", false)
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -92,7 +96,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("LolQweRty4321", true),
             Arguments.of("mnbvcx12034056", false),
             Arguments.of("12345678", true),
-            Arguments.of("", false)
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -110,7 +115,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("The_Password_12345", true),
             Arguments.of("Lets#Go#666666", false),
             Arguments.of("Русский_пароль", false),
-            Arguments.of("", false)
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -126,7 +132,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("JustPassword36433", true),
             Arguments.of("Lets#Go#666666", false),
             Arguments.of("tttrip", false),
-            Arguments.of("", true)
+            Arguments.of("", true),
+            Arguments.of(null, true)
     );
   }
 
@@ -142,7 +149,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("1234567", false),
             Arguments.of("12345678", true),
             Arguments.of("123456789", true),
-            Arguments.of("", false)
+            Arguments.of("", false),
+            Arguments.of(null, false)
     );
   }
 
@@ -163,7 +171,8 @@ public class PasswordCheckUtilTests {
             Arguments.of("mnbvcx102938", false),
             Arguments.of("qw_er_ty_12_34_43_21", true),
             Arguments.of("11", true),
-            Arguments.of("", true)
+            Arguments.of("", true),
+            Arguments.of(null, true)
     );
   }
 

@@ -46,7 +46,7 @@ public class PasswordCheckUtil {
   }
 
   public static boolean haveEnoughLength(String password){
-    return password.length() >= REQUIRED_PASSWORD_LENGTH;
+    return password != null && password.length() >= REQUIRED_PASSWORD_LENGTH;
   }
 
   /**
