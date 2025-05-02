@@ -92,19 +92,13 @@ public class BulkResultDetailedTests {
     assertEquals(currentFailure+1, resultWithData.getFailureAmount());
   }
 
-  @Test
-  void testCreateResultFunc() {
-    Long index = 0L;
-    BulkResultDetailed.ElementResult elementResult =
-            BulkResultDetailed.createResult(index, "item", item->createEmptyElementVErrors());
+  void assertAddResultFuncSuccess(long index, BulkResultDetailed.ElementResult elementResult) {
     assertEquals(index, elementResult.getIndex());
     assertEquals(BulkResultDetailed.ElementStatus.SUCCESS, elementResult.getStatus());
     assertNotEquals(null, elementResult.getErrors());
     assertEquals(0, elementResult.getErrors().size());
-
-    index = 1L;
-    elementResult = BulkResultDetailed.createResult(
-            index, "item", item->createAdditionalElementVErrors());
+  }
+  void assertAddResultFuncFailure(long index, BulkResultDetailed.ElementResult elementResult) {
     assertEquals(index, elementResult.getIndex());
     assertEquals(BulkResultDetailed.ElementStatus.FAILURE, elementResult.getStatus());
     assertNotEquals(null, elementResult.getErrors());
@@ -112,24 +106,28 @@ public class BulkResultDetailedTests {
   }
 
   @Test
+  void testCreateResultFunc() {
+    Long index = 0L;
+    BulkResultDetailed.ElementResult elementResult =
+            BulkResultDetailed.createResult(index, "item", item -> createEmptyElementVErrors());
+    assertAddResultFuncSuccess(index, elementResult);
+    index += 1L;
+    elementResult = BulkResultDetailed.createResult(
+            index, "item", item -> createAdditionalElementVErrors());
+    assertAddResultFuncFailure(index, elementResult);
+  }
+
+  @Test
   void testAddResultFunc() {
     BulkResultDetailed result = createHavingDataObject();
-
     Long index = (long) result.getResults().size();
     result.addResult(index, "item", item->createEmptyElementVErrors());
     var elementResult = result.getResults().get(Math.toIntExact(index));
-    assertEquals(index, elementResult.getIndex());
-    assertEquals(BulkResultDetailed.ElementStatus.SUCCESS, elementResult.getStatus());
-    assertNotEquals(null, elementResult.getErrors());
-    assertEquals(0, elementResult.getErrors().size());
-
+    assertAddResultFuncSuccess(index, elementResult);
     index += 1;
     result.addResult(index, "item", item->createAdditionalElementVErrors());
     elementResult = result.getResults().get(Math.toIntExact(index));
-    assertEquals(index, elementResult.getIndex());
-    assertEquals(BulkResultDetailed.ElementStatus.FAILURE, elementResult.getStatus());
-    assertNotEquals(null, elementResult.getErrors());
-    assertNotEquals(0, elementResult.getErrors().size());
+    assertAddResultFuncFailure(index, elementResult);
   }
 
   @Test
@@ -146,16 +144,9 @@ public class BulkResultDetailedTests {
     );
 
     var elementResult = result.getResults().get(Math.toIntExact(index+1));
-    assertEquals(index+1, elementResult.getIndex());
-    assertEquals(BulkResultDetailed.ElementStatus.SUCCESS, elementResult.getStatus());
-    assertNotEquals(null, elementResult.getErrors());
-    assertEquals(0, elementResult.getErrors().size());
-
+    assertAddResultFuncSuccess(index+1, elementResult);
     elementResult = result.getResults().get(Math.toIntExact(index+2));
-    assertEquals(index+2, elementResult.getIndex());
-    assertEquals(BulkResultDetailed.ElementStatus.FAILURE, elementResult.getStatus());
-    assertNotEquals(null, elementResult.getErrors());
-    assertNotEquals(0, elementResult.getErrors().size());
+    assertAddResultFuncFailure(index+2, elementResult);
   }
 
   @Test
