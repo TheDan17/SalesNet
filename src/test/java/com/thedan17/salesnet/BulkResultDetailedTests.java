@@ -2,36 +2,17 @@ package com.thedan17.salesnet;
 
 import com.thedan17.salesnet.core.object.data.BulkResultDetailed;
 import com.thedan17.salesnet.core.validation.ValidationError;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
 public class BulkResultDetailedTests {
-  List<BulkResultDetailed.ElementError> createEmptyElementErrors() {
-    return new ArrayList<>();
-  }
-  List<BulkResultDetailed.ElementError> createContainElementErrors() {
-    List<BulkResultDetailed.ElementError> list = new ArrayList<>();
-    list.add(new BulkResultDetailed.ElementError("source_kpp", "Message text #"));
-    list.add(new BulkResultDetailed.ElementError("source_hep", "Message text /"));
-    list.add(new BulkResultDetailed.ElementError("source_dgp", "Message text ="));
-    return list;
-  }
-  List<BulkResultDetailed.ElementError> createAdditionalElementErrors() {
-    List<BulkResultDetailed.ElementError> list = new ArrayList<>();
-    list.add(new BulkResultDetailed.ElementError("source_eno", "Message another"));
-    list.add(new BulkResultDetailed.ElementError("source_asl", "Message the msg"));
-    return list;
-  }
   List<ValidationError> createEmptyElementVErrors() {
     return new ArrayList<>();
   }
@@ -48,6 +29,24 @@ public class BulkResultDetailedTests {
     list.add(new ValidationError("source_vsl", "Message vthe msg"));
     return list;
   }
+  List<BulkResultDetailed.ElementError> createEmptyElementErrors() {
+    return new ArrayList<>();
+  }
+  List<BulkResultDetailed.ElementError> createContainElementErrors() {
+    List<BulkResultDetailed.ElementError> list = new ArrayList<>();
+    list.add(new BulkResultDetailed.ElementError("source_kpp", "Message text #"));
+    list.add(new BulkResultDetailed.ElementError("source_hep", "Message text /"));
+    list.add(new BulkResultDetailed.ElementError("source_dgp", "Message text ="));
+    return list;
+  }
+  BulkResultDetailed createHavingDataObject() {
+    BulkResultDetailed bulkResultDetailed = new BulkResultDetailed();
+    bulkResultDetailed.addResult(0, "item0", item -> createContainElementVErrors());
+    bulkResultDetailed.addResult(1, "item1", item -> createEmptyElementVErrors());
+    bulkResultDetailed.addResult(2, "item2", item -> createEmptyElementVErrors());
+    bulkResultDetailed.addResult(3, "item3", item -> createContainElementVErrors());
+    return bulkResultDetailed;
+  }
   BulkResultDetailed.ElementResult createSuccessElementResult(long index) {
     return new BulkResultDetailed.ElementResult(
             index,
@@ -61,21 +60,6 @@ public class BulkResultDetailedTests {
             BulkResultDetailed.ElementStatus.FAILURE,
             createContainElementErrors()
     );
-  }
-  BulkResultDetailed.ElementResult createFailureUpdateElementResult(long index) {
-    return new BulkResultDetailed.ElementResult(
-            index,
-            BulkResultDetailed.ElementStatus.FAILURE,
-            createAdditionalElementErrors()
-    );
-  }
-  BulkResultDetailed createHavingDataObject() {
-    BulkResultDetailed bulkResultDetailed = new BulkResultDetailed();
-    bulkResultDetailed.addResult(0, "item0", item -> createContainElementVErrors());
-    bulkResultDetailed.addResult(1, "item1", item -> createEmptyElementVErrors());
-    bulkResultDetailed.addResult(2, "item2", item -> createEmptyElementVErrors());
-    bulkResultDetailed.addResult(3, "item3", item -> createContainElementVErrors());
-    return bulkResultDetailed;
   }
 
   @Test
