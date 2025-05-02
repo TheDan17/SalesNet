@@ -76,7 +76,8 @@ public class BulkResultDetailed {
         result.get().errors.addAll(elem.errors);
       }
     } else {
-      this.addResult(elem);
+      throw new IllegalStateException(
+              "Impossible for an object to be missing when calling 'updateResult' method.");
     }
   }
 

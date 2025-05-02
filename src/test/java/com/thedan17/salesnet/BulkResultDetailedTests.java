@@ -102,7 +102,7 @@ public class BulkResultDetailedTests {
     assertEquals(currentSuccess+1, resultWithData.getSuccessAmount());
     assertEquals(currentFailure, resultWithData.getFailureAmount());
 
-    resultWithData.addResult(createFailureElementResult(currentTotal+1));
+    resultWithData.addResult(createFailureElementResult(currentTotal+1L));
     assertEquals(currentTotal+2, resultWithData.getTotalAmount());
     assertEquals(currentSuccess+1, resultWithData.getSuccessAmount());
     assertEquals(currentFailure+1, resultWithData.getFailureAmount());
