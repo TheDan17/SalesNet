@@ -54,21 +54,21 @@ public class AccountBulkService {
             })
             .peek(pair -> processResult.addResult(pair.getSecond()))
             .filter(pair ->
-                    pair.getSecond().getStatus() == BulkResultDetailed.BulkElementStatus.SUCCESS)
+                    pair.getSecond().getStatus() == BulkResultDetailed.ElementStatus.SUCCESS)
             .forEach(pair -> {
               try {
                 saveAccount(pair.getFirst());
               } catch (RuntimeException e) {
-                List<BulkResultDetailed.BulkElementError> errors = new ArrayList<>();
+                List<BulkResultDetailed.ElementError> errors = new ArrayList<>();
 
                 String msg = ExceptionUtils.getRootCauseMessage(e);
                 int dotIndex = msg.indexOf('.');
                 msg = dotIndex > 0 ? msg.substring(0, msg.indexOf('.')).trim() : msg;
 
-                errors.add(new BulkResultDetailed.BulkElementError("database_saving", msg));
-                processResult.updateResult(new BulkResultDetailed.BulkElementResult(
+                errors.add(new BulkResultDetailed.ElementError("database_saving", msg));
+                processResult.addResult(new BulkResultDetailed.ElementResult(
                         pair.getSecond().getIndex(),
-                        BulkResultDetailed.BulkElementStatus.FAILURE,
+                        BulkResultDetailed.ElementStatus.FAILURE,
                         errors
                 ));
               }
