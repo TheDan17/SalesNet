@@ -43,10 +43,10 @@ public interface EntityMapper {
   /** Маппинг Group. */
   GroupDto groupToDto(Group group);
 
-  /** Маппинг для TODO запроса Group. */
+  /** Маппинг для запроса Group. */
   Group idDtoToGroup(GroupIdDto groupIdDto);
 
-  /** Маппинг для TODO запроса Group. */
+  /** Маппинг для запроса Group. */
   Group dtoToGroup(GroupDto groupDto);
 
   /** Маппинг для POST, UPDATE запроса Group. */

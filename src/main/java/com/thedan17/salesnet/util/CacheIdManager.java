@@ -1,6 +1,5 @@
 package com.thedan17.salesnet.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,9 +8,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Класс для хранения и последующего обновления кэша.
@@ -23,21 +19,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * если планируется использовать методы {@link CacheIdManager#doAction} или {@link
  * CacheIdManager#hardUpdateCache} (неявно используется функцией {@link CacheIdManager#updateCache})
  *
- * @param <K> параметр поиска
- * @param <C> объект результатов поиска
- * @param <I> тип id, получаемого из объекта
+ * @param <K> Key, параметр поиска
+ * @param <O> Object, объект результатов поиска
+ * @param <I> Id, тип id, получаемого из объекта
  */
-public class CacheIdManager<K, C, I> {
+public class CacheIdManager<K, O, I> {
   private final Long cacheMaxSize;
   private final Short clearPercentage;
   private final HashMap<K, Set<I>> cache = new HashMap<>();
   private final Queue<K> history = new LinkedList<>();
   private final HashMap<I, Set<K>> linkRepository = new HashMap<>();
-  private final HashMap<I, C> entityRepository = new HashMap<>();
+  private final HashMap<I, O> entityRepository = new HashMap<>();
 
-  private final Function<C, I> getId;
-  private Function<K, Set<C>> cacheableAction;
-  private BiPredicate<K, C> isPairValid;
+  private final Function<O, I> getId;
+  private Function<K, Set<O>> cacheableAction;
+  private BiPredicate<K, O> isPairValid;
 
   private final AppLoggerCore logger = new AppLoggerCore();
 
@@ -49,7 +45,7 @@ public class CacheIdManager<K, C, I> {
   }
 
   /** Конструктор для задания настроек класса. */
-  public CacheIdManager(Function<C, I> getIdFunc, long sizeOfCache, short clearPercentage) {
+  public CacheIdManager(Function<O, I> getIdFunc, long sizeOfCache, short clearPercentage) {
     if (clearPercentage < 1 || clearPercentage > 100) {
       throw new IllegalArgumentException("Clear percentage in CacheIdManager must be between 1 and 100");
     }
@@ -61,8 +57,8 @@ public class CacheIdManager<K, C, I> {
 
   /** Задание опциональных полей класса. */
   public void setFunctionality(
-      Function<K, Set<C>> cacheableAction,
-      BiPredicate<K, C> isPairValid) {
+      Function<K, Set<O>> cacheableAction,
+      BiPredicate<K, O> isPairValid) {
     this.cacheableAction = cacheableAction;
     this.isPairValid = isPairValid;
     logger.debug("Functionality set");
@@ -73,16 +69,16 @@ public class CacheIdManager<K, C, I> {
    *
    * @param isResultCaching влияет на то, сохранятся ли полученные данные в кэш при их отсутствии
    */
-  public Set<C> doAction(K argument, boolean isResultCaching) {
+  public Set<O> doAction(K argument, boolean isResultCaching) {
     logger.debug("Entry doAction");
     logger.debug("Key argument: {}", argument.toString());
-    Optional<Set<C>> cacheResult = getCachedAction(argument);
+    Optional<Set<O>> cacheResult = getCachedAction(argument);
     if (cacheResult.isPresent()) {
       logger.debug("Cache hit");
       return cacheResult.get();
     }
     logger.debug("Cache miss");
-    Set<C> actionResult = cacheableAction.apply(argument);
+    Set<O> actionResult = cacheableAction.apply(argument);
     if (isResultCaching) {
       logger.debug("Add cache");
       addCache(argument, actionResult);
@@ -94,7 +90,7 @@ public class CacheIdManager<K, C, I> {
    * Перегрузка для {@link #doAction(Object, boolean)}, когда кэширование отсутствующего результата
    * подразумевается по умолчанию.
    */
-  public Set<C> doAction(K argument) {
+  public Set<O> doAction(K argument) {
     return doAction(argument, true);
   }
 
@@ -103,9 +99,9 @@ public class CacheIdManager<K, C, I> {
    *
    * @return значение из кэша по параметру поиска, иначе {@code Optional.empty()}
    */
-  public Optional<Set<C>> getCachedAction(K argument) {
+  public Optional<Set<O>> getCachedAction(K argument) {
     Set<I> resultInner = cache.get(argument);
-    Set<C> result = new HashSet<>();
+    Set<O> result = new HashSet<>();
     if (resultInner == null) {
       return Optional.empty();
     }
@@ -124,10 +120,10 @@ public class CacheIdManager<K, C, I> {
    *   <li>Помимо самих записей добавляет быстрые ссылки на ключи, которые будут содержать значения
    * </ul>
    */
-  public void addCache(K key, Set<C> results) {
+  public void addCache(K key, Set<O> results) {
     trimCacheIfFull();
     Set<I> resultsCopy = new HashSet<>();
-    for (C resItem : results) {
+    for (O resItem : results) {
       I id = getId.apply(resItem);
       resultsCopy.add(id);
       entityRepository.put(id, resItem);
@@ -144,8 +140,7 @@ public class CacheIdManager<K, C, I> {
    *
    * @param includeKeysWithoutEntity флаг, отвечающий за жёсткость актуализации кэша
    */
-  public void updateCache(
-          C entity, UpdateReason updateReason, boolean includeKeysWithoutEntity) {
+  public void updateCache(O entity, UpdateReason updateReason, boolean includeKeysWithoutEntity) {
     logger.debug("Entry to updating cache, reason: {}", updateReason.toString());
     logger.debug("Entity - {}", entity.toString());
     logger.debug(
@@ -203,12 +198,12 @@ public class CacheIdManager<K, C, I> {
   }
 
   /** Перегрузка для значения по умолчанию у {@link #updateCache(Object, UpdateReason, boolean)}. */
-  public void softUpdateCache(C group, UpdateReason updateReason) {
+  public void softUpdateCache(O group, UpdateReason updateReason) {
     updateCache(group, updateReason, false);
   }
 
   /** Перегрузка для значения по умолчанию у {@link #updateCache(Object, UpdateReason, boolean)}. */
-  public void hardUpdateCache(C group, UpdateReason updateReason) {
+  public void hardUpdateCache(O group, UpdateReason updateReason) {
     updateCache(group, updateReason, true);
   }
 
@@ -219,7 +214,7 @@ public class CacheIdManager<K, C, I> {
     linkRepository.clear();
   }
 
-  /** Метод, который удаляет самые старые записи из кэша. */
+  /** Метод, который удаляет самые старые записи из кэша, определённый процент от размера. */
   private void trimCache() {
     long targetCacheSize = (long) (cacheMaxSize * ((100.0 - clearPercentage) / 100.0));
     while (cache.size() > targetCacheSize) {

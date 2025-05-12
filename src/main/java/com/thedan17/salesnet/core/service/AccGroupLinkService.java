@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Класс сервисного слоя, который отвечает за добавление и удаление связей {@code AccGroupLink}. */
 @Service
@@ -34,6 +35,7 @@ public class AccGroupLinkService {
   }
 
   /** Добавление уникальной связи между {@code Account} и {@code Group}, GET запрос. */
+  @Transactional
   public Optional<AccGroupLinkDto> linkAccWithGroup(Long accId, Long groupId) {
     Account account = accountRepository.findById(accId).orElseThrow();
     Group group = groupRepository.findById(groupId).orElseThrow();
@@ -51,6 +53,7 @@ public class AccGroupLinkService {
   }
 
   /** Удаление существующей связи между {@code Account} и {@code Group}, DELETE запрос. */
+  @Transactional
   public void unlinkAccWithGroup(Long accId, Long groupId) {
     AccGroupLink accGroupLink =
         accGroupLinkRepository
