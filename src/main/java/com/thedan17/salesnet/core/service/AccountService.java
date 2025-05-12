@@ -1,10 +1,12 @@
 package com.thedan17.salesnet.core.service;
 
+import com.thedan17.salesnet.core.dao.AccGroupLinkRepository;
 import com.thedan17.salesnet.core.dao.AccountRepository;
 import com.thedan17.salesnet.core.object.dto.AccountInfoDto;
 import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
 import com.thedan17.salesnet.core.object.dto.GroupIdDto;
+import com.thedan17.salesnet.core.object.entity.AccGroupLink;
 import com.thedan17.salesnet.core.object.entity.Account;
 import com.thedan17.salesnet.util.CommonUtil;
 import com.thedan17.salesnet.util.EntityMapper;
@@ -23,11 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountService {
   @Autowired private final AccountRepository dao;
   @Autowired private final EntityMapper entityMapper;
+  @Autowired private final AccGroupLinkRepository accGroupLinkRepository;
 
   /** Конструктор для автопривязки необходимых классов. */
-  public AccountService(AccountRepository repository, EntityMapper entityMapper) {
+  public AccountService(AccountRepository repository, EntityMapper entityMapper, AccGroupLinkRepository accGroupLinkRepository) {
     this.dao = repository;
     this.entityMapper = entityMapper;
+    this.accGroupLinkRepository = accGroupLinkRepository;
   }
 
   /** Метод создания и добавления {@code Account} в бд по информации пользователя. */
@@ -63,7 +67,8 @@ public class AccountService {
       return Optional.empty();
     }
     List<GroupIdDto> groupIdDtoList = new ArrayList<>();
-    for (var member : account.get().getMembers()) {
+    List<AccGroupLink> links = accGroupLinkRepository.findByAccount(account.get());
+    for (var member : links) {
       groupIdDtoList.add(entityMapper.groupToIdDto(member.getGroup()));
     }
     return Optional.of(groupIdDtoList);

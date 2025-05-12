@@ -1,6 +1,5 @@
 package com.thedan17.salesnet.core.service;
 
-import com.thedan17.salesnet.core.dao.AccGroupLinkRepository;
 import com.thedan17.salesnet.core.dao.AccountRepository;
 import com.thedan17.salesnet.core.dao.GroupRepository;
 import com.thedan17.salesnet.core.object.dto.AccGroupLinkDto;
@@ -19,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccGroupLinkService {
   @Autowired private final GroupRepository groupRepository;
   @Autowired private final AccountRepository accountRepository;
-  @Autowired private final AccGroupLinkRepository accGroupLinkRepository;
+  @Autowired private final com.thedan17.salesnet.core.dao.AccGroupLinkRepository accGroupLinkRepository;
   @Autowired private final EntityMapper entityMapper;
 
   /** Конструктор сервисного класса для автопривязки Spring. */
   public AccGroupLinkService(
       GroupRepository groupRepository,
       AccountRepository accountRepository,
-      AccGroupLinkRepository accGroupLinkRepository,
+      com.thedan17.salesnet.core.dao.AccGroupLinkRepository accGroupLinkRepository,
       EntityMapper entityMapper) {
     this.groupRepository = groupRepository;
     this.accountRepository = accountRepository;
@@ -47,7 +46,7 @@ public class AccGroupLinkService {
     accGroupLink.setGroup(group);
     accGroupLink = accGroupLinkRepository.save(accGroupLink);
     // Synchronize
-    account.getMembers().add(accGroupLink);
+    //account.getMembers().add(accGroupLink);
     group.getMembers().add(accGroupLink);
     return Optional.of(entityMapper.linkToDto(accGroupLink));
   }
@@ -59,7 +58,7 @@ public class AccGroupLinkService {
         accGroupLinkRepository
             .findByAccountIdAndGroupId(accId, groupId)
             .orElseThrow(() -> new EntityNotFoundException("Связь не найдена"));
-    accGroupLink.getAccount().getMembers().remove(accGroupLink);
+    //accGroupLink.getAccount().getMembers().remove(accGroupLink);
     accGroupLink.getGroup().getMembers().remove(accGroupLink);
     accGroupLinkRepository.delete(accGroupLink);
   }

@@ -10,7 +10,7 @@ import lombok.Setter;
 /**
  * Класс для хранения в БД связей между {@code Account} и {@code Group}.
  *
- * <p>Использует аннотации jakarta для хранения в {@code AccGroupLinkRepository} (наследник {@code
+ * <p>Использует аннотации jakarta для хранения в {@code AccGroupLinkService} (наследник {@code
  * JpaRepository<AccGroupLink, Long>})
  */
 @Entity
@@ -33,5 +33,4 @@ public class AccGroupLink {
   private Account account;
 
   private final LocalDateTime linkedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
 }

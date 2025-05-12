@@ -29,7 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/api")
 public class AccGroupLinkController {
-  @Autowired AccGroupLinkService accGroupLinkService;
+  @Autowired
+  AccGroupLinkService accGroupLinkService;
 
   /**
    * CREATE endpoint - Создание связи через точку входа {@code Account}.
