@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 import lombok.Data;
 
 /**
@@ -47,10 +45,10 @@ public class Account {
   /** Получение объектов {@code Group} из связей. */
   @Transient
   public List<Group> getGroups() {
-    List<Group> groups = new ArrayList<>();
-    for (AccGroupLink member : this.members) {
-      groups.add(member.getGroup());
-    }
-    return groups;
+    return Collections.unmodifiableList(
+            members.stream()
+                    .map(AccGroupLink::getGroup)
+                    .toList()
+    );
   }
 }
