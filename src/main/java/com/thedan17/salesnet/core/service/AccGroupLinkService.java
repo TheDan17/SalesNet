@@ -46,7 +46,6 @@ public class AccGroupLinkService {
     accGroupLink.setGroup(group);
     accGroupLink = accGroupLinkRepository.save(accGroupLink);
     // Synchronize
-    //account.getMembers().add(accGroupLink);
     group.getMembers().add(accGroupLink);
     return Optional.of(entityMapper.linkToDto(accGroupLink));
   }
@@ -58,7 +57,6 @@ public class AccGroupLinkService {
         accGroupLinkRepository
             .findByAccountIdAndGroupId(accId, groupId)
             .orElseThrow(() -> new EntityNotFoundException("Связь не найдена"));
-    //accGroupLink.getAccount().getMembers().remove(accGroupLink);
     accGroupLink.getGroup().getMembers().remove(accGroupLink);
     accGroupLinkRepository.delete(accGroupLink);
   }

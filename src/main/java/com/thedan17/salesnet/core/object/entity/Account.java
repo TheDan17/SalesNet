@@ -34,21 +34,8 @@ public class Account {
   private String type;
   private LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-  //@OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  //private Set<AccGroupLink> members = new HashSet<>();
-
   /** Дефолтный конструктор для создания связей. */
   public Account() {
     // Just default constructor
   }
-
-  /** Получение объектов {@code Group} из связей. */
-  /*@Transient
-  public List<Group> getGroups() {
-    return Collections.unmodifiableList(
-            members.stream()
-                    .map(AccGroupLink::getGroup)
-                    .toList()
-    );
-  }*/
 }
