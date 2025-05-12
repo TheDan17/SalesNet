@@ -137,6 +137,11 @@ public class AccountService {
   /** Метод удаления Account, по его id. */
   @Transactional
   public Boolean deleteAccount(Long id) {
+    Account account = dao.findById(id).orElseThrow();
+    List<AccGroupLink> links = accGroupLinkRepository.findByAccount(account);
+    for (var link : links) {
+      accGroupLinkRepository.delete(link);
+    }
     if (this.getAccountEntityById(id).isPresent()) {
       dao.deleteById(id);
       return true;
