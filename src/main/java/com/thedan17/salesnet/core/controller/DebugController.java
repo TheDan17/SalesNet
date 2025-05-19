@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityManagerFactory;
+
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +52,12 @@ public class DebugController {
       @RequestParam(required = true) Short year,
       @RequestParam(required = true) Short month,
       @RequestParam(required = true) Short day) {
-    Optional<String> logString = debugService.getLogByDate(LocalDate.of(year, month, day));
+    Optional<String> logString;
+    try {
+      logString = debugService.getLogByDate(LocalDate.of(year, month, day));
+    } catch (DateTimeException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
     return logString
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(""));

@@ -1,9 +1,7 @@
 package com.thedan17.salesnet.util;
 
-import com.thedan17.salesnet.exception.ContentNotFoundException;
-import com.thedan17.salesnet.exception.InvalidRequestBodyException;
-import com.thedan17.salesnet.exception.InvalidSearchParameterException;
-import com.thedan17.salesnet.exception.LogNotExistException;
+import com.thedan17.salesnet.exception.*;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({InvalidSearchParameterException.class,
                      InvalidRequestBodyException.class})
   public ResponseEntity<ProblemDetail> handleInvalidRequestData(
-          InvalidSearchParameterException e, HandlerMethod handlerMethod) {
+          Exception e, HandlerMethod handlerMethod) {
     return handleExceptionDefault(e, handlerMethod, HttpStatus.BAD_REQUEST);
   }
 
@@ -46,12 +44,19 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({LogNotExistException.class,
                      ContentNotFoundException.class})
   public ResponseEntity<ProblemDetail> handleInvalidContentId(
-          LogNotExistException e, HandlerMethod handlerMethod) {
+          Exception e, HandlerMethod handlerMethod) {
     return handleExceptionDefault(e, handlerMethod, HttpStatus.NOT_FOUND);
   }
 
+  /** Перехват исключения игнорирования запроса. */
+  @ExceptionHandler(RequestIgnoreNeededException.class)
+  public ResponseEntity<ProblemDetail> handleIgnoreException(
+          Exception e, HandlerMethod handlerMethod) {
+    return handleExceptionDefault(e, handlerMethod, HttpStatus.ACCEPTED);
+  }
+
   /** Удержание всех остальных исключений. Предназначено для production. */
-  // @ExceptionHandler(Exception.class)
+  //@ExceptionHandler(Exception.class)
   public void handleUnhandledException(Exception e, HandlerMethod handlerMethod) {
     this.appLogEnricher.logException(handlerMethod, e);
   }
