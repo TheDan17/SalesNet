@@ -3,7 +3,9 @@ package com.thedan17.salesnet.core.object.dto;
 import java.time.LocalDateTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Класс-проекция сущности {@code Group} (без связей {@code AccGroupLink}).
@@ -14,6 +16,8 @@ import lombok.Data;
     description =
         "DTO для предоставления информации о группе, которая была получена непрямым способом (например, через поиск по критериям)")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupIdDto {
   @Schema(description = "ID группы, присваиваемое системой")
   private Long id;
@@ -30,5 +34,5 @@ public class GroupIdDto {
   @Schema(
       description =
           "ID аккаунта, который владеет группой (может меняться по желанию текущего владельца)")
-  private Long ownerId = (long) -1;
+  private Long ownerId;
 }

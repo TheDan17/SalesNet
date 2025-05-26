@@ -3,13 +3,18 @@ package com.thedan17.salesnet.core.object.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 
 /** DTO для передачи регистрационной информации от пользователя к серверу. */
 @Schema(description = "DTO для предоставления информации при регистрации аккаунта.")
 @Data
 @FieldNameConstants
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountSignupDto {
   @Schema(description = "Уникальный буквенный идентификатор, желаемый пользователем")
   @NotBlank
@@ -28,8 +33,8 @@ public class AccountSignupDto {
         - Хотя бы одна цифра
         - Хотя бы одна прописная буква
         - Хотя бы одна строчная буква
-        - Отсутствует последовательность, содержащую более трех символов типа 'qwerty'
-        - Отсутствует последовательность, содержащую более трех символов типа '123456'
+        - Отсутствует последовательности, содержащие более трех символов типа 'qwerty'
+        - Отсутствует последовательности, содержащие более трех символов типа '123456'
         """)
   @NotBlank
   private String password;
@@ -39,6 +44,7 @@ public class AccountSignupDto {
   private String firstName;
 
   @Schema(description = "Фамилия, используется, только если это физическое лицо, иначе пустое поле")
+  @NotNull
   private String secondName;
 
   @Schema(description = "Тип аккаунта, который указывает на принадлежность к физ.лицу/ИП/ООО/ОАО")

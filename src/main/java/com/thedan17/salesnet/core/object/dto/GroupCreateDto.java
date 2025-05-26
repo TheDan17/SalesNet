@@ -14,4 +14,6 @@ public class GroupCreateDto {
   private String name;
   @Schema(description = "Описание будущей группы")
   private String description;
+  @Schema(description = "ID аккаунта владельца")
+  private Long ownerId;
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 @Schema(description = "DTO для обновления определенной информации аккаунта его владельцем. Все поля повторяют аналогичные у AccountSignupDto")
 @Data
 public class AccountUpdateDto {
+  String email;
   String firstName;
   String secondName;
   String type;

@@ -6,7 +6,10 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /** Сущность для представления существующей группы, в которому могут вступать {@code Account}. */
@@ -15,6 +18,7 @@ import lombok.ToString;
 @Table(
     name = "groups",
     indexes = {@Index(columnList = "customId", unique = true)})
+@AllArgsConstructor
 public class Group {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +34,8 @@ public class Group {
   @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
   private Set<AccGroupLink> members = new HashSet<>();
+
+  private Long ownerId;
 
   /** Конструктор инициализации для Spring. */
   public Group(String name, String description) {

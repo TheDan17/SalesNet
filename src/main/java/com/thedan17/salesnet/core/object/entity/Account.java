@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Внутренний класс для представления аккаунта пользователя.
@@ -18,6 +20,7 @@ import lombok.Data;
 @Table(
     name = "accounts",
     indexes = {@Index(columnList = "login", unique = true)})
+@AllArgsConstructor
 public class Account {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +33,7 @@ public class Account {
 
   // info data
   private String firstName;
+  @Column(nullable = false)
   private String secondName;
   private String type;
   private LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
