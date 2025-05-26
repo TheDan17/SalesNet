@@ -1,0 +1,10 @@
+FROM nginx:stable-alpine
+LABEL authors="TheDan17"
+
+WORKDIR /usr/share/nginx/html
+
+COPY ./dist .
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
