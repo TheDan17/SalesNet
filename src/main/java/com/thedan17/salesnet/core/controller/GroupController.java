@@ -1,16 +1,20 @@
 package com.thedan17.salesnet.core.controller;
 
+import com.thedan17.salesnet.core.dao.GroupRepository;
 import com.thedan17.salesnet.core.object.dto.AccountInfoDto;
 import com.thedan17.salesnet.core.object.dto.GroupCreateDto;
 import com.thedan17.salesnet.core.object.dto.GroupDto;
 import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.service.GroupService;
+import com.thedan17.salesnet.util.EntityMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +35,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/groups")
 public class GroupController {
   @Autowired private GroupService groupService;
+
+  // TODO fix
+  @Autowired private GroupRepository groupRepository;
+  @Autowired private EntityMapper entityMapper;
+  @GetMapping
+  public ResponseEntity<List<GroupIdDto>> getAllAccounts() {
+    return ResponseEntity.ok(
+            groupRepository
+                    .findAll()
+                    .stream()
+                    .map(entityMapper::groupToIdDto)
+                    .toList()
+    );
+  }
 
   /**
    * CREATE endpoint - Создание нового {@code Group}. Делегирует вызов {@link GroupService}
@@ -113,7 +131,7 @@ public class GroupController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PutMapping("/{id}")
-  public ResponseEntity<GroupDto> updateGroup(
+  public ResponseEntity<GroupIdDto> updateGroup(
       @PathVariable Long id, @RequestBody GroupCreateDto updatedGroup) {
     return groupService
         .updateGroup(id, updatedGroup)

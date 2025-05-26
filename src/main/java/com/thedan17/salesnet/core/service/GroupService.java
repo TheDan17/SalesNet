@@ -116,7 +116,7 @@ public class GroupService {
 
   /** Обновление уже существующей {@code Group}. */
   @Transactional
-  public Optional<GroupDto> updateGroup(Long id, GroupCreateDto newGroupDto) {
+  public Optional<GroupIdDto> updateGroup(Long id, GroupCreateDto newGroupDto) {
     Group newGroup = entityMapper.createDtoToGroup(newGroupDto);
     Optional<Group> group = groupDao.findById(id);
     if (group.isEmpty()) {
@@ -124,10 +124,11 @@ public class GroupService {
     }
     group.get().setName(newGroup.getName());
     group.get().setDescription(newGroup.getDescription());
+    group.get().setOwnerId(newGroup.getOwnerId());
     groupSearchCacheService.updateExistingCache(
         group.get(), CacheIdManager.UpdateReason.ENTITY_EDITED);
     return CommonUtil.optionalFromException(
-        () -> entityMapper.groupToDto(groupDao.save(group.get())),
+        () -> entityMapper.groupToIdDto(groupDao.save(group.get())),
         DataIntegrityViolationException.class);
   }
 }

@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 @Service
 public class DebugTaskService {
-  private final Map<Integer, AsyncTaskInfo<LocalDate, Path>> tasks = new ConcurrentHashMap<>();
+  public final Map<Integer, AsyncTaskInfo<LocalDate, Path>> tasks = new ConcurrentHashMap<>();
   private final AtomicInteger idCounter = new AtomicInteger(0);
 
   public DebugTaskService() {
@@ -33,7 +33,7 @@ public class DebugTaskService {
   public void runLogTask(AsyncTaskInfo<LocalDate, Path> taskInfo) {
     taskInfo.setStatus(AsyncTaskInfo.Status.RUNNING);
     try {
-      Thread.sleep(10000); // Long task imitation
+      Thread.sleep(1000); // Long task imitation
       Path filePath = getLogByDate(taskInfo.getParams());
 
       taskInfo.setResult(filePath);
@@ -44,8 +44,7 @@ public class DebugTaskService {
         taskInfo.setStatus(AsyncTaskInfo.Status.DONE);
       }
     } catch (InterruptedException e) {
-      taskInfo.setStatus(AsyncTaskInfo.Status.FAILED);
-      Thread.currentThread().interrupt();
+      throw new RuntimeException(e);
     }
   }
 
@@ -84,7 +83,7 @@ public class DebugTaskService {
     return taskInfo.getResult();
   }
 
-  private Path getLogByDate(LocalDate logDate) throws InterruptedException {
+  public Path getLogByDate(LocalDate logDate) throws InterruptedException {
     String logDir = "./logs/"; // Путь к папке с логами
     String fileNamePattern = "log-" + logDate + ".log"; // Например, "log-2023-10-05.log"
 
@@ -96,7 +95,7 @@ public class DebugTaskService {
       if (logPath.isPresent()) {
         return logPath.get();
       }
-    } catch (IOException _) {}
+    } catch (IOException e) {}
 
     return null;
   }

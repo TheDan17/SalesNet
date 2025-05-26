@@ -8,6 +8,7 @@ import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
 import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.object.entity.AccGroupLink;
 import com.thedan17.salesnet.core.object.entity.Account;
+import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.util.CommonUtil;
 import com.thedan17.salesnet.util.EntityMapper;
 import jakarta.persistence.criteria.Predicate;
@@ -86,6 +87,22 @@ public class AccountService {
     return Optional.of(entityMapper.accountToInfoDto(account));
   }
 
+  public Specification<Account> buildAccountSpecification(String firstName, String secondName, String type) {
+    return (root, query, criteriaBuilder) -> {
+      List<Predicate> predicates = new ArrayList<>();
+      if (firstName != null) {
+        predicates.add(criteriaBuilder.equal(root.get("firstName"), firstName));
+      }
+      if (secondName != null) {
+        predicates.add(criteriaBuilder.equal(root.get("secondName"), secondName));
+      }
+      if (type != null) {
+        predicates.add(criteriaBuilder.equal(root.get("type"), type));
+      }
+      return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+    };
+  }
+
   /** Метод фильтрации всех {@link Account} из БД по критериям и возврат в публичном виде.
    *
    * <p>Если все критерии равны null, то вернёт пустой список. */
@@ -95,20 +112,7 @@ public class AccountService {
     if (firstName == null && secondName == null && type == null) {
       return new ArrayList<>();
     }
-    Specification<Account> spec =
-        (root, query, criteriaBuilder) -> {
-          List<Predicate> predicates = new ArrayList<>();
-          if (firstName != null) {
-            predicates.add(criteriaBuilder.equal(root.get("firstName"), firstName));
-          }
-          if (secondName != null) {
-            predicates.add(criteriaBuilder.equal(root.get("secondName"), secondName));
-          }
-          if (type != null) {
-            predicates.add(criteriaBuilder.equal(root.get("type"), type));
-          }
-          return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
+    Specification<Account> spec = buildAccountSpecification(firstName, secondName, type);
     List<Account> accountList = dao.findAll(spec);
     List<AccountInfoDto> accountInfoDtoList = new ArrayList<>();
     for (var account : accountList) {
@@ -137,8 +141,11 @@ public class AccountService {
   /** Метод удаления Account, по его id. */
   @Transactional
   public Boolean deleteAccount(Long id) {
-    Account account = dao.findById(id).orElseThrow();
-    List<AccGroupLink> links = accGroupLinkRepository.findByAccount(account);
+    Optional<Account> account = dao.findById(id);
+    if (account.isEmpty()) {
+      throw new ContentNotFoundException("Account ID=" + id + " not exist");
+    }
+    List<AccGroupLink> links = accGroupLinkRepository.findByAccount(account.get());
     for (var link : links) {
       accGroupLinkRepository.delete(link);
     }

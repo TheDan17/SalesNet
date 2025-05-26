@@ -1,5 +1,6 @@
 package com.thedan17.salesnet.core.controller;
 
+import com.thedan17.salesnet.core.dao.AccountRepository;
 import com.thedan17.salesnet.core.object.dto.AccountInfoDto;
 import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
@@ -8,6 +9,7 @@ import com.thedan17.salesnet.core.service.AccountService;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.exception.ExceptionCommonLiterals;
 import com.thedan17.salesnet.exception.InvalidRequestBodyException;
+import com.thedan17.salesnet.util.EntityMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +17,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -34,6 +38,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/accounts")
 public class AccountController {
   @Autowired private final AccountService accountService;
+
+  // TODO fix
+  @Autowired private AccountRepository accountRepository;
+  @Autowired private EntityMapper entityMapper;
+  @GetMapping
+  public ResponseEntity<List<AccountInfoDto>> getAllAccounts() {
+    return ResponseEntity.ok(
+            accountRepository
+                    .findAll()
+                    .stream()
+                    .map(entityMapper::accountToInfoDto)
+                    .toList()
+    );
+  }
 
   /** Конструктор для привязки соответствующего сервисного слоя. */
   public AccountController(AccountService service) {
