@@ -29,11 +29,8 @@ public class DebugTaskService {
   public final Map<Integer, AsyncTaskInfo<LocalDate, Path>> tasks = new ConcurrentHashMap<>();
   private final AtomicInteger idCounter = new AtomicInteger(0);
 
-  @Autowired private final AppLoggerCore appLoggerCore;
-
-  public DebugTaskService(AppLoggerCore appLoggerCore) {
-    this.appLoggerCore = appLoggerCore;
-  }
+  @Autowired
+  private AppLoggerCore appLoggerCore;
 
   public void runLogTask(AsyncTaskInfo<LocalDate, Path> taskInfo) {
     taskInfo.setStatus(AsyncTaskInfo.Status.RUNNING);
