@@ -22,6 +22,7 @@ public class EntityMapperTests {
     String groupName = "group name";
     String groupDescription = "group description";
     Group group = new Group(groupName, groupDescription);
+    group.setOwnerId(-1L);
     group.setId(groupId);
     return group;
   }

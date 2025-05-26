@@ -1,12 +1,6 @@
 package com.thedan17.salesnet.util;
 
-import com.thedan17.salesnet.core.object.dto.AccGroupLinkDto;
-import com.thedan17.salesnet.core.object.dto.AccountInfoDto;
-import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
-import com.thedan17.salesnet.core.object.dto.AccountUpdateDto;
-import com.thedan17.salesnet.core.object.dto.GroupCreateDto;
-import com.thedan17.salesnet.core.object.dto.GroupDto;
-import com.thedan17.salesnet.core.object.dto.GroupIdDto;
+import com.thedan17.salesnet.core.object.dto.*;
 import com.thedan17.salesnet.core.object.entity.AccGroupLink;
 import com.thedan17.salesnet.core.object.entity.Account;
 import com.thedan17.salesnet.core.object.entity.Group;
@@ -23,7 +17,7 @@ public interface EntityMapper {
   /** Перевод из Account в AccountInfo для GET запроса. */
   @Mapping(
       target = "fullName",
-      expression = "java(combineNames(account.getFirstName(), account.getSecondName()))")
+      expression = "java(account.getSecondName() != null ? combineNames(account.getFirstName(), account.getSecondName()) : account.getFirstName())")
   AccountInfoDto accountToInfoDto(Account account);
 
   /** Метод для объединения полей Account в поле для DTO. */
@@ -51,6 +45,10 @@ public interface EntityMapper {
 
   /** Маппинг для POST, UPDATE запроса Group. */
   Group createDtoToGroup(GroupCreateDto groupCreateDto);
+
+  GroupAccountsDto groupToGroupAccounts(Group group);
+
+  AccGroupLink createDtoToLink(AccGroupLinkCreateDto accGroupLinkCreateDto);
 
   /** Маппинг для возвращаемого значения POST запроса создания связи. */
   @Mapping(target = "groupId", expression = "java(accGroupLink.getGroup().getId())")
