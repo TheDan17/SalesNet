@@ -3,6 +3,9 @@ package com.thedan17.salesnet.core.service;
 import com.thedan17.salesnet.core.object.data.AsyncTaskInfo;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.exception.RequestIgnoreNeededException;
+import com.thedan17.salesnet.util.AppLogEnricher;
+import com.thedan17.salesnet.util.AppLoggerCore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,8 +29,10 @@ public class DebugTaskService {
   public final Map<Integer, AsyncTaskInfo<LocalDate, Path>> tasks = new ConcurrentHashMap<>();
   private final AtomicInteger idCounter = new AtomicInteger(0);
 
-  public DebugTaskService() {
-    System.out.println("CONSTRUCTOR");
+  @Autowired private final AppLoggerCore appLoggerCore;
+
+  public DebugTaskService(AppLoggerCore appLoggerCore) {
+    this.appLoggerCore = appLoggerCore;
   }
 
   public void runLogTask(AsyncTaskInfo<LocalDate, Path> taskInfo) {
@@ -44,7 +49,7 @@ public class DebugTaskService {
         taskInfo.setStatus(AsyncTaskInfo.Status.DONE);
       }
     } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      Thread.currentThread().interrupt();
     }
   }
 
@@ -103,20 +108,16 @@ public class DebugTaskService {
   @Scheduled(fixedDelay = 30_000) // 30.000ms = 0.5min
   public void cleanupOldTasks() {
     try {
-      System.out.println("CLEANUP RUN");
       Instant cutoff = Instant.now().minusSeconds(300); // 5 minutes
       tasks.entrySet().removeIf(entry -> {
         AsyncTaskInfo<LocalDate, Path> info = entry.getValue();
         info.calcDuration();
-        System.out.println("CLEANUP RETURN");
         return (info.getStatus() == AsyncTaskInfo.Status.DONE ||
                 info.getStatus() == AsyncTaskInfo.Status.FAILED ) &&
                 info.getCompletedAt().isBefore(cutoff);
       });
     } catch (Exception e) {
-      System.err.println("Cleanup task failed: " + e.getMessage());
-      e.printStackTrace();
+      appLoggerCore.error("Exception while cleanup tasks in DebugTaskService: " + e.getMessage());
     }
-    System.out.println("CLEANUP WHAT");
   }
 }
