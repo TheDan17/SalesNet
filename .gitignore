@@ -1,29 +1,20 @@
-# --- from common recommend ---
-# Игнорируем файлы IDE
-.idea/
-#*.iml
-#*.ipr
-#*.iws
-
 # Игнорируем скомпилированные файлы
 *.class
 *.jar
 *.war
 *.ear
 
-# Игнорируем папки сборки
-# target/
-# build/
-
 # Игнорируем логи
+logs/
 *.log
 
 # Игнорируем файлы окружения
 .env
 
-# --- from generator ---
+# Игнорируем побочные файлы
 HELP.md
 target/
+dist/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -38,6 +29,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
+.idea/
 .idea
 *.iws
 *.iml
