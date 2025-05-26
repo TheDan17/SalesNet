@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -19,6 +22,8 @@ import lombok.Setter;
 @Table(
     name = "acc_group_link",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"account_id", "group_id"})})
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccGroupLink {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +36,8 @@ public class AccGroupLink {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id")
   private Account account;
+
+  private String inviteCode;
 
   private final LocalDateTime linkedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 }
