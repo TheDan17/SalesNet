@@ -85,7 +85,7 @@ public class DebugTaskService {
     return taskInfo.getResult();
   }
 
-  public Path getLogByDate(LocalDate logDate) throws InterruptedException {
+  public Path getLogByDate(LocalDate logDate) {
     String logDir = "./logs/"; // Путь к папке с логами
     String fileNamePattern = "log-" + logDate + ".log"; // Например, "log-2023-10-05.log"
 
