@@ -2,6 +2,9 @@ package com.thedan17.salesnet.core.controller;
 
 import com.thedan17.salesnet.core.object.data.AsyncTaskInfo;
 import com.thedan17.salesnet.core.service.DebugTaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.nio.file.Path;
@@ -9,6 +12,9 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.core.io.FileSystemResource;
@@ -30,31 +36,51 @@ public class DebugTaskController {
     this.debugTaskService = debugTaskService;
   }
 
+  @Operation(summary = "Создание задачи получения лог-файла по дате")
+  @ApiResponses({
+          @ApiResponse(responseCode = "201", description = "Задача создана"),
+          @ApiResponse(responseCode = "400", description = "Дата невалидна")
+  })
   @PostMapping("/log/create_task")
-  public ResponseEntity<Integer> createGetLogTask(@RequestParam Short year,
-                                                  @RequestParam Short month,
-                                                  @RequestParam Short day) {
+  public ResponseEntity<Integer> createGetLogTask(@Valid @Min(1970) @RequestParam Short year,
+                                                  @Valid @Min(1) @Max(12) @RequestParam Short month,
+                                                  @Valid @Min(1) @Max(31)  @RequestParam Short day) {
     LocalDate taskParams;
     try {
       taskParams = LocalDate.of(year, month, day);
     } catch (DateTimeException e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1);
     }
-    return ResponseEntity.ok(debugTaskService.getLogNewTask(taskParams));
+    return ResponseEntity.status(HttpStatus.CREATED).body(debugTaskService.getLogNewTask(taskParams));
   }
 
+  @Operation(summary = "Получение списка информации по всем существующим задачам")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "Список задач получен")
+  })
   @GetMapping("/log/get_all_tasks")
   public ResponseEntity<List<AsyncTaskInfo<LocalDate, Path>>> getAllTasks() {
     return ResponseEntity.ok(debugTaskService.getAllTasks());
   }
 
+  @Operation(summary = "Получение статуса конкретной задачи")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "Статус получен"),
+          @ApiResponse(responseCode = "404", description = "Задачи с таким ID не существует")
+  })
   @GetMapping("/log/check_task")
-  public ResponseEntity<AsyncTaskInfo.Status> getStatus(@RequestParam Integer taskId) {
+  public ResponseEntity<AsyncTaskInfo.Status> getStatus(@Valid @Min(1) @RequestParam Integer taskId) {
     return ResponseEntity.ok(debugTaskService.getTaskStatus(taskId));
   }
 
+  @Operation(summary = "Получение результата выполнения задачи")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "Файл получен"),
+          @ApiResponse(responseCode = "202", description = "Задача существует, но не завершена"),
+          @ApiResponse(responseCode = "404", description = "Задача с таким ID не существует")
+  })
   @GetMapping("/log/get_result")
-  public ResponseEntity<Resource> downloadFile(@RequestParam Integer taskId) {
+  public ResponseEntity<Resource> downloadFile(@Valid @Min(1) @RequestParam Integer taskId) {
     Path filePath = debugTaskService.getLogFile(taskId);
     if (filePath == null) {
       return ResponseEntity.noContent().build();

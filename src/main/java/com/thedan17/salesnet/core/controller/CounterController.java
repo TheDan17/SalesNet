@@ -5,6 +5,11 @@ import com.thedan17.salesnet.exception.ContentNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -12,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+@Tag(name = "URL Counter API", description = "Для подсчёта статистики посещения endpoint'ов.")
 @RestController
 @RequestMapping("/api/stats/url")
 public class CounterController {
@@ -22,6 +28,11 @@ public class CounterController {
     this.counterService = counterService;
   }
 
+  @Operation(summary = "Получение всех счётчиков либо одного конкретного по шаблону endpoint.")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "Успешно получена статистика"),
+          @ApiResponse(responseCode = "404", description = "Такого URL нет в статистике")
+  })
   @GetMapping
   ResponseEntity<Map<String, Integer>> getAllCounters(@RequestParam(required = false) String path) {
     if (path == null) {

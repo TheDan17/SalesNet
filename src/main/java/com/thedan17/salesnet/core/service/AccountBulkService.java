@@ -2,9 +2,11 @@ package com.thedan17.salesnet.core.service;
 
 import com.thedan17.salesnet.core.dao.AccountRepository;
 import com.thedan17.salesnet.core.object.data.BulkResultDetailed;
+import com.thedan17.salesnet.core.object.data.BulkResultShort;
 import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.object.entity.Account;
 import com.thedan17.salesnet.core.validation.validator.AccountLoginDtoValidator;
+import com.thedan17.salesnet.exception.InvalidRequestBodyException;
 import com.thedan17.salesnet.util.CommonUtil;
 import com.thedan17.salesnet.util.EntityMapper;
 
@@ -42,6 +44,17 @@ public class AccountBulkService {
     accountRepository.save(account);
   }
 
+  public void addAccountsBulkWhole(List<AccountSignupDto> accountsDto) {
+    List<Account> accs = accountsDto
+            .stream()
+            .map(this::makeAccount)
+            .toList();
+    try {
+      accountRepository.saveAll(accs);
+    } catch (Exception e) {
+      throw new InvalidRequestBodyException("Exception occured in bulk saving: " + e.getMessage());
+    }
+  }
   public BulkResultDetailed addAccountsBulk(List<AccountSignupDto> accountsDto) {
     BulkResultDetailed processResult = new BulkResultDetailed();
     IntStream.range(0, accountsDto.size())

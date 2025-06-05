@@ -11,6 +11,7 @@ import com.thedan17.salesnet.core.object.entity.Account;
 import com.thedan17.salesnet.core.object.entity.Group;
 import com.thedan17.salesnet.core.service.AccountService;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
+import com.thedan17.salesnet.exception.SuchElementExistException;
 import com.thedan17.salesnet.util.EntityMapper;
 
 import java.time.LocalDateTime;
@@ -83,9 +84,7 @@ class AccountServiceTest {
     when(entityMapper.loginDtoToAccount(signupDto)).thenReturn(accountEntity);
     when(accountRepository.save(accountEntity)).thenThrow(DataIntegrityViolationException.class);
 
-    Optional<AccountInfoDto> result = accountService.addAccount(signupDto);
-
-    assertThat(result).isEmpty();
+    assertThrows(SuchElementExistException.class, ()->accountService.addAccount(signupDto));
   }
 
   @Test

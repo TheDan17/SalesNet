@@ -1,5 +1,6 @@
 package com.thedan17.salesnet.core.object.dto;
 
+import com.thedan17.salesnet.core.validation.AllowedValues;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -49,5 +50,6 @@ public class AccountSignupDto {
 
   @Schema(description = "Тип аккаунта, который указывает на принадлежность к физ.лицу/ИП/ООО/ОАО")
   @NotBlank
+  @AllowedValues(value = {"Physical", "OOO", "OAO", "SoleProp", "Corporate", "Business"})
   private String type;
 }

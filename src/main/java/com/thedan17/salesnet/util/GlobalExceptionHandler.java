@@ -17,16 +17,19 @@ import org.springframework.web.method.HandlerMethod;
 @ControllerAdvice
 public class GlobalExceptionHandler {
   @Autowired AppLogEnricher appLogEnricher;
+  @Autowired AppLoggerCore appLoggerCore;
 
   /** Конструктор. */
-  public GlobalExceptionHandler(AppLogEnricher appLogEnricher) {
+  public GlobalExceptionHandler(AppLogEnricher appLogEnricher, AppLoggerCore appLoggerCore) {
     this.appLogEnricher = appLogEnricher;
+    this.appLoggerCore = appLoggerCore;
   }
 
   /** Логирование перехваченной ошибки и формирование ответа на запрос. */
   private ResponseEntity<ProblemDetail> handleExceptionDefault(
         Exception exception, HandlerMethod handlerMethod, HttpStatus httpStatus) {
     this.appLogEnricher.onExceptionHandled(Pair.of(exception, handlerMethod));
+    this.appLoggerCore.error("Exception occurred: " + exception.getMessage());
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(httpStatus, exception.getMessage());
     problemDetail.setProperty("timestamp", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     return ResponseEntity.of(problemDetail).build();
@@ -34,7 +37,8 @@ public class GlobalExceptionHandler {
 
   /** Перехват исключений плохого запроса по вине запроса. */
   @ExceptionHandler({InvalidSearchParameterException.class,
-                     InvalidRequestBodyException.class})
+                     InvalidRequestBodyException.class,
+                     SuchElementExistException.class})
   public ResponseEntity<ProblemDetail> handleInvalidRequestData(
           Exception e, HandlerMethod handlerMethod) {
     return handleExceptionDefault(e, handlerMethod, HttpStatus.BAD_REQUEST);

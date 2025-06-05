@@ -1,6 +1,7 @@
 package com.thedan17.salesnet.core.object.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 /** Класс-проекция сущности {@code Group} без id и createdAt.

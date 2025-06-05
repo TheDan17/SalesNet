@@ -3,10 +3,8 @@ package com.thedan17.salesnet.core.service;
 import com.thedan17.salesnet.core.object.data.AsyncTaskInfo;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.exception.RequestIgnoreNeededException;
-import com.thedan17.salesnet.util.AppLogEnricher;
 import com.thedan17.salesnet.util.AppLoggerCore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +28,12 @@ public class DebugTaskService {
   private final AtomicInteger idCounter = new AtomicInteger(0);
 
   @Autowired
-  private AppLoggerCore appLoggerCore;
+  public AppLoggerCore appLoggerCore;
 
   public void runLogTask(AsyncTaskInfo<LocalDate, Path> taskInfo) {
     taskInfo.setStatus(AsyncTaskInfo.Status.RUNNING);
     try {
-      Thread.sleep(1000); // Long task imitation
+      Thread.sleep(15000); // Long task imitation
       Path filePath = getLogByDate(taskInfo.getParams());
 
       taskInfo.setResult(filePath);

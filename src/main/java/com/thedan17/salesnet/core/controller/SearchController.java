@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -45,7 +47,7 @@ public class SearchController {
   public ResponseEntity<List<AccountInfoDto>> searchAccounts(
           @RequestParam(required = false) String firstName,
           @RequestParam(required = false) String secondName,
-          @RequestParam(required = false) String type) {
+          @Valid @RequestParam(required = false) String type) {
     return ResponseEntity.status(HttpStatus.OK)
             .body(accountService.searchAccounts(firstName, secondName, type));
   }
@@ -67,7 +69,7 @@ public class SearchController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   public ResponseEntity<Set<GroupIdDto>> searchGroups(
-      @RequestParam String name, @RequestParam(required = false) Long accId) {
+      @RequestParam String name, @Valid @Min(1) @RequestParam(required = false) Long accId) {
     if (name.length() <= 3) {
       throw new InvalidSearchParameterException(
           "To search groups by name, length of value must be more than 3");

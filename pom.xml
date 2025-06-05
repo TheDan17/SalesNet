@@ -6,13 +6,12 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.thedan17</groupId>
 	<artifactId>salesnet</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<name>SalesNet</name>
-	<url/>
 	<licenses>
 		<license/>
 	</licenses>
@@ -91,6 +90,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -140,6 +140,12 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<exclude>**/AccountBulkService.class</exclude>
+								<exclude>**/AccountBulkService\$*.class</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

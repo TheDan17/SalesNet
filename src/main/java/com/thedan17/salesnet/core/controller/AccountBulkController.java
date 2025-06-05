@@ -33,6 +33,28 @@ public class AccountBulkController {
    * @see AccountBulkService#addAccountsBulk(List)
    */
   @Operation(
+          summary = "Создать множество аккаунтов",
+          description =
+                  "Возвращает структуру, отображающую успешные и неуспешные по обработке элементы")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "Все элементы были обработаны успешно"),
+          @ApiResponse(responseCode = "207", description = "Элементы были частично успешно обработаны"),
+          @ApiResponse(responseCode = "400", description = "Ни один элемент не был обработан успешно")
+  })
+  @PostMapping("/accounts/bulk")
+  ResponseEntity<Void> addAccountsBulkWhole(
+          @RequestBody List<AccountSignupDto> accountsData) {
+    accountBulkService.addAccountsBulkWhole(accountsData);
+    return ResponseEntity.ok().build();
+  }
+
+  /**
+   * Массовое создание аккаунтов с частиным результатом. Делегирует операцию {@link
+   * AccountBulkService}.
+   *
+   * @see AccountBulkService#addAccountsBulk(List)
+   */
+  @Operation(
       summary = "Создать множество аккаунтов",
       description =
           "Возвращает структуру, отображающую успешные и неуспешные по обработке элементы")
@@ -41,9 +63,9 @@ public class AccountBulkController {
     @ApiResponse(responseCode = "207", description = "Элементы были частично успешно обработаны"),
     @ApiResponse(responseCode = "400", description = "Ни один элемент не был обработан успешно")
   })
-  @PostMapping("/accounts/bulk")
+  @PostMapping("/accounts/bulk-partial")
   ResponseEntity<BulkResultDetailed> addAccountsBulk(
-     @RequestBody List<AccountSignupDto> accountsData) {
+      @RequestBody List<AccountSignupDto> accountsData) {
     BulkResultDetailed addAccountsResult = accountBulkService.addAccountsBulk(accountsData);
     return BulkResultResponseFactory.fromResult(addAccountsResult);
   }

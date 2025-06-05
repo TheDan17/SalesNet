@@ -4,9 +4,11 @@ import com.thedan17.salesnet.core.object.data.AsyncTaskInfo;
 import com.thedan17.salesnet.core.service.DebugTaskService;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.exception.RequestIgnoreNeededException;
+import com.thedan17.salesnet.util.AppLoggerCore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -17,17 +19,44 @@ import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class DebugTaskServiceTest {
 
-  private DebugTaskService service;
+  private DebugTaskService debugTaskService;
 
   @BeforeEach
   void setUp() {
-    service = spy(new DebugTaskService());
+    debugTaskService = spy(new DebugTaskService());
+  }
+
+  @Test
+  void cleanupOldTasks_shouldNotRemoveCompletedButRecent() {
+    AsyncTaskInfo<LocalDate, Path> recent = new AsyncTaskInfo<>(7, LocalDate.now());
+    recent.setStatus(AsyncTaskInfo.Status.DONE);
+    recent.setCompletedAt(Instant.now()); // новое
+
+    debugTaskService.tasks.put(7, recent);
+
+    debugTaskService.cleanupOldTasks();
+
+    assertTrue(debugTaskService.tasks.containsKey(7)); // НЕ удалён
+  }
+
+  @Test
+  void cleanupOldTasks_shouldNotRemoveNotYetCompletedEvenIfOld() {
+    AsyncTaskInfo<LocalDate, Path> pending = new AsyncTaskInfo<>(8, LocalDate.now());
+    pending.setStatus(AsyncTaskInfo.Status.RUNNING); // или PENDING
+    pending.setCompletedAt(Instant.now().minusSeconds(600)); // старый
+
+    debugTaskService.tasks.put(8, pending);
+
+    debugTaskService.cleanupOldTasks();
+
+    assertTrue(debugTaskService.tasks.containsKey(8)); // НЕ удалён
   }
 
   // 1) getLogByDate(LocalDate)
@@ -44,7 +73,7 @@ class DebugTaskServiceTest {
               .getDeclaredMethod("getLogByDate", LocalDate.class);
       m.setAccessible(true);
 
-      Path result = (Path) m.invoke(service, date);
+      Path result = (Path) m.invoke(debugTaskService, date);
       assertEquals(expected, result);
     }
   }
@@ -60,7 +89,7 @@ class DebugTaskServiceTest {
               .getDeclaredMethod("getLogByDate", LocalDate.class);
       m.setAccessible(true);
 
-      assertNull(m.invoke(service, date));
+      assertNull(m.invoke(debugTaskService, date));
     }
   }
 
@@ -73,8 +102,8 @@ class DebugTaskServiceTest {
       cf.when(() -> CompletableFuture.runAsync(any(Runnable.class)))
               .thenAnswer(inv -> { ((Runnable)inv.getArgument(0)).run(); return null; });
 
-      Integer id = service.getLogNewTask(date);
-      AsyncTaskInfo<LocalDate, Path> info = service.getTaskInfo(id);
+      Integer id = debugTaskService.getLogNewTask(date);
+      AsyncTaskInfo<LocalDate, Path> info = debugTaskService.getTaskInfo(id);
 
       assertEquals(id, info.getId());
       assertEquals(date, info.getParams());
@@ -86,7 +115,7 @@ class DebugTaskServiceTest {
   // 4) getTaskInfo(Integer)
   @Test
   void getTaskInfo_shouldThrowIfMissing() {
-    assertThrows(ContentNotFoundException.class, () -> service.getTaskInfo(999));
+    assertThrows(ContentNotFoundException.class, () -> debugTaskService.getTaskInfo(999));
   }
 
   // 5) getLogFile(Integer)
@@ -95,9 +124,9 @@ class DebugTaskServiceTest {
     AsyncTaskInfo<LocalDate, Path> info = new AsyncTaskInfo<>(3, LocalDate.now());
     info.setStatus(AsyncTaskInfo.Status.RUNNING);
     // подменяем getTaskInfo:
-    doReturn(info).when(service).getTaskInfo(3);
+    doReturn(info).when(debugTaskService).getTaskInfo(3);
 
-    assertThrows(RequestIgnoreNeededException.class, () -> service.getLogFile(3));
+    assertThrows(RequestIgnoreNeededException.class, () -> debugTaskService.getLogFile(3));
   }
 
   @Test
@@ -106,12 +135,12 @@ class DebugTaskServiceTest {
     AsyncTaskInfo<LocalDate, Path> info = new AsyncTaskInfo<>(4, LocalDate.now());
     info.setStatus(AsyncTaskInfo.Status.DONE);
     info.setResult(p);
-    doReturn(info).when(service).getTaskInfo(4);
+    doReturn(info).when(debugTaskService).getTaskInfo(4);
 
-    assertEquals(p, service.getLogFile(4));
+    assertEquals(p, debugTaskService.getLogFile(4));
 
     info.setStatus(AsyncTaskInfo.Status.FAILED);
-    assertEquals(p, service.getLogFile(4));
+    assertEquals(p, debugTaskService.getLogFile(4));
   }
 
   // 6) cleanupOldTasks() и лямбда
@@ -121,17 +150,17 @@ class DebugTaskServiceTest {
     AsyncTaskInfo<LocalDate, Path> old = new AsyncTaskInfo<>(5, LocalDate.now());
     old.setStatus(AsyncTaskInfo.Status.DONE);
     old.setCompletedAt(Instant.now().minusSeconds(600)); // старше 5 мин
-    service.tasks.put(5, old);
+    debugTaskService.tasks.put(5, old);
 
     // и свежую
     AsyncTaskInfo<LocalDate, Path> fresh = new AsyncTaskInfo<>(6, LocalDate.now());
     fresh.setStatus(AsyncTaskInfo.Status.DONE);
     fresh.setCompletedAt(Instant.now());
-    service.tasks.put(6, fresh);
+    debugTaskService.tasks.put(6, fresh);
 
-    service.cleanupOldTasks();
+    debugTaskService.cleanupOldTasks();
 
-    assertFalse(service.tasks.containsKey(5));
-    assertTrue(service.tasks.containsKey(6));
+    assertFalse(debugTaskService.tasks.containsKey(5));
+    assertTrue(debugTaskService.tasks.containsKey(6));
   }
 }

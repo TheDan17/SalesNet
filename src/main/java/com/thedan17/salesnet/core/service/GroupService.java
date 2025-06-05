@@ -6,6 +6,7 @@ import com.thedan17.salesnet.core.object.dto.GroupCreateDto;
 import com.thedan17.salesnet.core.object.dto.GroupDto;
 import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.object.entity.Group;
+import com.thedan17.salesnet.exception.SuchElementExistException;
 import com.thedan17.salesnet.util.CacheIdManager;
 import com.thedan17.salesnet.util.CommonUtil;
 import com.thedan17.salesnet.util.EntityMapper;
@@ -50,7 +51,7 @@ public class GroupService {
       groupSearchCacheService.updateExistingCache(
           resultInner, CacheIdManager.UpdateReason.ENTITY_ADDED);
     } catch (DataIntegrityViolationException e) {
-      return Optional.empty();
+      throw new SuchElementExistException("Create group error: " + e.getMessage());
     }
     return Optional.of(entityMapper.groupToIdDto(resultInner));
   }

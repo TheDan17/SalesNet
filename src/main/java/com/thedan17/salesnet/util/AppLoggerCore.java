@@ -26,10 +26,10 @@ public class AppLoggerCore {
       initialize();
     } catch (Exception e) {
       basicLogger.error(
-          "Failed to initialize {}, occurred exception '{}':{}",
-          AppLoggerCore.class,
-          e.getClass(),
-          e.getMessage());
+              "Failed to initialize {}, occurred exception '{}':{}",
+              AppLoggerCore.class,
+              e.getClass(),
+              e.getMessage());
     }
   }
 
@@ -65,6 +65,9 @@ public class AppLoggerCore {
     ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
     consoleAppender.setContext(loggerContext);
 
+    rollingFileAppender.setName("AppFileAppender");
+    consoleAppender.setName("AppConsoleAppender");
+
     PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     encoder.setContext(loggerContext);
     encoder.setPattern("APP [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} - %msg%n");
@@ -75,10 +78,13 @@ public class AppLoggerCore {
     consoleAppender.setEncoder(encoder);
     consoleAppender.start();
 
-    logbackLogger.addAppender(rollingFileAppender);
-    logbackLogger.addAppender(consoleAppender);
-    logbackLogger.setLevel(Level.TRACE);
-    basicLogger.debug("{} initialized.", AppLoggerCore.class);
+    if (logbackLogger.getAppender("AppFileAppender") == null) {
+      logbackLogger.addAppender(rollingFileAppender);
+    }
+    if (logbackLogger.getAppender("AppConsoleAppender") == null) {
+      logbackLogger.addAppender(consoleAppender);
+    }
+    logbackLogger.setLevel(Level.DEBUG);
   }
 
   public void log(Level level, String message, Object... args) {

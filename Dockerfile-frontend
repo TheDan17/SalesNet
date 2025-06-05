@@ -1,6 +1,7 @@
 FROM nginx:stable-alpine
 LABEL authors="TheDan17"
 
+RUN rm -rf /usr/share/nginx/html/dist
 WORKDIR /usr/share/nginx/html
 
 COPY ./dist .

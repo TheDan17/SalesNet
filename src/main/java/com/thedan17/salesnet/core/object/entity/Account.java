@@ -33,7 +33,7 @@ public class Account {
 
   // info data
   private String firstName;
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String secondName;
   private String type;
   private LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);

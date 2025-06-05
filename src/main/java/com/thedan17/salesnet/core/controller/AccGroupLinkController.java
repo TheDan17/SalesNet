@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -60,7 +62,7 @@ public class AccGroupLinkController {
     );
   }
   @PostMapping("/links")
-  public ResponseEntity<AccGroupLinkDto> addLink(@RequestBody AccGroupLinkCreateDto newLink) {
+  public ResponseEntity<AccGroupLinkDto> addLink(@Valid @RequestBody AccGroupLinkCreateDto newLink) {
     var link = accGroupLinkService.linkAccWithGroup(newLink);
     if (link.isEmpty()) {
       throw new InvalidRequestBodyException("Non-valid ID in body");
@@ -68,7 +70,7 @@ public class AccGroupLinkController {
     return ResponseEntity.ok(link.get());
   }
   @DeleteMapping("/links/{id}")
-  public ResponseEntity<Void> deleteLink(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteLink(@Valid @Min(1) @PathVariable Long id) {
     accGroupLinkService.deleteLink(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
@@ -167,7 +169,8 @@ public class AccGroupLinkController {
     @ApiResponse(responseCode = "404", description = "Один из ID не существует")
   })
   @DeleteMapping(value = "accounts/{accId}/groups")
-  public ResponseEntity<Void> removeGroupFromAcc(@PathVariable Long accId, @RequestParam Long id) {
+  public ResponseEntity<Void> removeGroupFromAcc(
+          @Valid @Min(1) @PathVariable Long accId, @Valid @Min(1) @RequestParam Long id) {
     try {
       accGroupLinkService.unlinkAccWithGroup(accId, id);
       return ResponseEntity.noContent().build();
@@ -192,7 +195,7 @@ public class AccGroupLinkController {
   })
   @DeleteMapping(value = "groups/{groupId}/accounts")
   public ResponseEntity<Void> removeAccFromGroup(
-      @PathVariable Long groupId, @RequestParam Long id) {
+          @Valid @Min(1) @PathVariable Long groupId, @Valid @Min(1) @RequestParam Long id) {
     try {
       accGroupLinkService.unlinkAccWithGroup(id, groupId);
       return ResponseEntity.noContent().build();

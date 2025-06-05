@@ -7,11 +7,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.nio.file.Path;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,18 +57,25 @@ public class DebugController {
     @ApiResponse(responseCode = "404", description = "Лог для такой даты не найден")
   })
   @GetMapping("/log")
-  public ResponseEntity<String> getLogByData(
-      @RequestParam(required = true) Short year,
-      @RequestParam(required = true) Short month,
-      @RequestParam(required = true) Short day) {
-    Optional<String> logString;
+  public ResponseEntity<Resource> getLogByData(
+      @Valid @Min(1970) @RequestParam(required = true) Short year,
+      @Valid @Min(1) @Max(12) @RequestParam(required = true) Short month,
+      @Valid @Min(1) @Max(31) @RequestParam(required = true) Short day) {
+    LocalDate taskParams;
     try {
-      logString = debugService.getLogByDate(LocalDate.of(year, month, day));
+      taskParams = LocalDate.of(year, month, day);
     } catch (DateTimeException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
-    return logString
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(""));
+    Path filePath = debugService.getLogByDate(taskParams);
+    if (filePath == null) {
+      return ResponseEntity.notFound().build();
+    }
+    Resource resource = new FileSystemResource(filePath.toFile());
+    String headerValue = "attachment; filename=%s".formatted(filePath.getFileName());
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+            .contentType(MediaType.TEXT_PLAIN)
+            .body(resource);
   }
 }

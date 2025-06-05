@@ -9,6 +9,7 @@ import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.object.entity.AccGroupLink;
 import com.thedan17.salesnet.core.object.entity.Account;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
+import com.thedan17.salesnet.exception.SuchElementExistException;
 import com.thedan17.salesnet.util.CommonUtil;
 import com.thedan17.salesnet.util.EntityMapper;
 import jakarta.persistence.criteria.Predicate;
@@ -39,11 +40,14 @@ public class AccountService {
   @Transactional
   public Optional<AccountInfoDto> addAccount(AccountSignupDto accountSignupDto) {
     Account account = entityMapper.loginDtoToAccount(accountSignupDto);
+    if (account.getSecondName() == null){
+      account.setSecondName("");
+    }
     account.setPasswordHash(CommonUtil.hashWithSha256(accountSignupDto.getPassword()));
     try {
       account = dao.save(account);
     } catch (DataIntegrityViolationException e) {
-      return Optional.empty();
+      throw new SuchElementExistException("Create account error: " + e.getMessage());
     }
     return Optional.of(entityMapper.accountToInfoDto(account));
   }

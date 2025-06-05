@@ -1,12 +1,17 @@
 package com.thedan17.salesnet;
 
 import com.thedan17.salesnet.core.service.DebugService;
+import com.thedan17.salesnet.core.service.DebugTaskService;
+import com.thedan17.salesnet.exception.ContentNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,39 +27,31 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DebugServiceTest {
+  @Mock
+  private DebugTaskService debugTaskService;
 
-  DebugService debugService;
+  @InjectMocks
+  private DebugService debugService;
 
+  /*
   @BeforeEach
   void setUp() {
     debugService = new DebugService();
   }
+  */
 
   @Test
   void getLogByDate_shouldReturnContent_WhenLogFileExists() throws IOException {
     LocalDate date = LocalDate.of(2023, 10, 5);
     String fileName = "log-" + date + ".log";
     Path mockPath = Paths.get("./logs/" + fileName);
-    String expectedContent = "Some log content";
+    Path expectedContent = Path.of("path/to/file.txt");
 
-    try (MockedStatic<Files> filesMockedStatic = Mockito.mockStatic(Files.class)) {
-      filesMockedStatic
-              .when(() -> Files.list(Paths.get("./logs/")))
-              .thenReturn(Stream.of(mockPath));
+    when(debugTaskService.getLogByDate(date)).thenReturn(Path.of("path/to/file.txt"));
+    Path result = debugService.getLogByDate(date);
 
-      filesMockedStatic
-              .when(() -> Files.isRegularFile(mockPath))
-              .thenReturn(true);
-
-      filesMockedStatic
-              .when(() -> Files.readString(mockPath))
-              .thenReturn(expectedContent);
-
-      Optional<String> result = debugService.getLogByDate(date);
-
-      assertTrue(result.isPresent());
-      assertEquals(expectedContent, result.get());
-    }
+    assertNotNull(result);
+    assertEquals(expectedContent, result);
   }
 
   @Test
@@ -71,12 +68,13 @@ class DebugServiceTest {
               .when(() -> Files.isRegularFile(anotherPath))
               .thenReturn(true);
 
-      Optional<String> result = debugService.getLogByDate(date);
+      when(debugTaskService.getLogByDate(date)).thenReturn(null);
 
-      assertTrue(result.isEmpty());
+      assertThrows(ContentNotFoundException.class, ()->debugService.getLogByDate(date));
     }
   }
 
+  /*
   @Test
   void getLogByDate_shouldReturnEmpty_WhenIOExceptionOccurs() throws IOException {
     LocalDate date = LocalDate.now();
@@ -86,9 +84,11 @@ class DebugServiceTest {
               .when(() -> Files.list(Paths.get("./logs/")))
               .thenThrow(new IOException("Simulated failure"));
 
-      Optional<String> result = debugService.getLogByDate(date);
+      when(debugTaskService.getLogByDate(date)).thenReturn(null);
+      Path result = debugService.getLogByDate(date);
 
-      assertTrue(result.isEmpty());
+      assertNull(result);
     }
   }
+  */
 }

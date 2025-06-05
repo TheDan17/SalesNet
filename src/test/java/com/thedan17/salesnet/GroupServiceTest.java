@@ -10,6 +10,7 @@ import com.thedan17.salesnet.core.object.dto.GroupIdDto;
 import com.thedan17.salesnet.core.dao.GroupRepository;
 import com.thedan17.salesnet.core.service.GroupService;
 import com.thedan17.salesnet.core.service.GroupSearchCacheService;
+import com.thedan17.salesnet.exception.SuchElementExistException;
 import com.thedan17.salesnet.util.CacheIdManager;
 import com.thedan17.salesnet.util.EntityMapper;
 import jakarta.persistence.criteria.Predicate;
@@ -65,8 +66,7 @@ class GroupServiceTest {
     when(entityMapper.createDtoToGroup(dto)).thenReturn(group);
     when(groupDao.save(group)).thenThrow(DataIntegrityViolationException.class);
 
-    Optional<GroupIdDto> result = groupService.addGroup(dto);
-    assertTrue(result.isEmpty());
+    assertThrows(SuchElementExistException.class, ()->groupService.addGroup(dto));
   }
 
   @Test

@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -42,6 +44,10 @@ public class AccountController {
   // TODO fix
   @Autowired private AccountRepository accountRepository;
   @Autowired private EntityMapper entityMapper;
+  @Operation(summary = "Получить все аккаунты")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "Список получен")
+  })
   @GetMapping
   public ResponseEntity<List<AccountInfoDto>> getAllAccounts() {
     return ResponseEntity.ok(
@@ -80,7 +86,7 @@ public class AccountController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PostMapping
-  public ResponseEntity<AccountInfoDto> createAccount(@RequestBody AccountSignupDto account) {
+  public ResponseEntity<AccountInfoDto> createAccount(@Valid @RequestBody AccountSignupDto account) {
     return accountService
         .addAccount(account)
         .map(infoDto -> ResponseEntity.status(HttpStatus.CREATED).body(infoDto))
@@ -101,7 +107,7 @@ public class AccountController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @GetMapping("/{id}")
-  public ResponseEntity<AccountInfoDto> getAccountById(@PathVariable Long id) {
+  public ResponseEntity<AccountInfoDto> getAccountById(@Valid @Min(1) @PathVariable Long id) {
     return accountService
         .getAccountById(id)
         .map(infoDto -> ResponseEntity.status(HttpStatus.OK).body(infoDto))
@@ -124,7 +130,7 @@ public class AccountController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @GetMapping("/{id}/groups")
-  public ResponseEntity<List<GroupIdDto>> getAccountGroups(@PathVariable Long id) {
+  public ResponseEntity<List<GroupIdDto>> getAccountGroups(@Valid @Min(1) @PathVariable Long id) {
     return accountService
         .getAccountGroups(id)
         .map(groupIdDtoMany -> ResponseEntity.status(HttpStatus.OK).body(groupIdDtoMany))
@@ -147,7 +153,7 @@ public class AccountController {
   })
   @PutMapping("/{id}")
   public ResponseEntity<AccountInfoDto> updateAccount(
-      @PathVariable Long id, @RequestBody AccountUpdateDto updatedAccount) {
+          @Valid @Min(1) @PathVariable Long id, @RequestBody AccountUpdateDto updatedAccount) {
     return accountService
         .updateAccount(id, updatedAccount)
         .map(infoDto -> ResponseEntity.status(HttpStatus.OK).body(infoDto))
@@ -169,7 +175,7 @@ public class AccountController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteAccount(@Valid @Min(1) @PathVariable Long id) {
     if (Boolean.TRUE.equals(accountService.deleteAccount(id))) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     } else {

@@ -10,7 +10,6 @@ import com.thedan17.salesnet.util.EntityMapper;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;

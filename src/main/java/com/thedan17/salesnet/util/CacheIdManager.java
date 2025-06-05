@@ -24,6 +24,7 @@ import java.util.function.Function;
  * @param <I> Id, тип id, получаемого из объекта
  */
 public class CacheIdManager<K, O, I> {
+  private static Short fullPercentage = 100;
   private final Long cacheMaxSize;
   private final Short clearPercentage;
   private final HashMap<K, Set<I>> cache = new HashMap<>();
@@ -47,7 +48,8 @@ public class CacheIdManager<K, O, I> {
   /** Конструктор для задания настроек класса. */
   public CacheIdManager(Function<O, I> getIdFunc, long sizeOfCache, short clearPercentage) {
     if (clearPercentage < 1 || clearPercentage > 100) {
-      throw new IllegalArgumentException("Clear percentage in CacheIdManager must be between 1 and 100");
+      throw new IllegalArgumentException(
+          "Clear percentage in CacheIdManager must be between 1 and 100");
     }
     this.cacheMaxSize = sizeOfCache;
     this.clearPercentage = clearPercentage;
@@ -56,9 +58,7 @@ public class CacheIdManager<K, O, I> {
   }
 
   /** Задание опциональных полей класса. */
-  public void setFunctionality(
-      Function<K, Set<O>> cacheableAction,
-      BiPredicate<K, O> isPairValid) {
+  public void setFunctionality(Function<K, Set<O>> cacheableAction, BiPredicate<K, O> isPairValid) {
     this.cacheableAction = cacheableAction;
     this.isPairValid = isPairValid;
     logger.debug("Functionality set");
@@ -216,9 +216,9 @@ public class CacheIdManager<K, O, I> {
 
   /** Метод, который удаляет самые старые записи из кэша, определённый процент от размера. */
   private void trimCache() {
-    long targetCacheSize = (long) (cacheMaxSize * ((100.0 - clearPercentage) / 100.0));
+    long targetCacheSize = (cacheMaxSize * ((fullPercentage - clearPercentage) / fullPercentage));
     while (cache.size() > targetCacheSize) {
-      if (history.isEmpty()) {
+      if (history.isEmpty()) { 
         throw new IllegalStateException("Cache overflow clear is running despite cache is empty");
       }
       K cleaningKey = history.poll();

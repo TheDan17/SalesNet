@@ -3,7 +3,7 @@ LABEL authors="TheDan17"
 
 WORKDIR /app
 
-COPY target/salesnet-0.0.5.jar app.jar
+COPY target/salesnet.jar app.jar
 
 EXPOSE 8080
 
