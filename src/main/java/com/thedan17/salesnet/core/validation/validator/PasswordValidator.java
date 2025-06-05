@@ -3,7 +3,6 @@ package com.thedan17.salesnet.core.validation.validator;
 import com.thedan17.salesnet.core.object.dto.AccountSignupDto;
 import com.thedan17.salesnet.core.validation.ValidationError;
 import com.thedan17.salesnet.util.PasswordCheckUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 

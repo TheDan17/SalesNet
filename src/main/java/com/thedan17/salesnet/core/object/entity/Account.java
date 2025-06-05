@@ -1,14 +1,10 @@
 package com.thedan17.salesnet.core.object.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Внутренний класс для представления аккаунта пользователя.

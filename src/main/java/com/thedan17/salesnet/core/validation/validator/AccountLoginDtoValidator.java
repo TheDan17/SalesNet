@@ -31,7 +31,7 @@ public class AccountLoginDtoValidator {
     // Password errors
     errors.addAll(PasswordValidator.validate(dto.getPassword()));
     // Specific errors
-    if (!dto.getType().equals("Physical") && !dto.getSecondName().isBlank()){
+    if (!dto.getType().equals("Physical") && !dto.getSecondName().isBlank()) {
       errors.add(new ValidationError(AccountSignupDto.Fields.secondName,
               "Second name field should be empty, when type is not 'Physical'"));
     }

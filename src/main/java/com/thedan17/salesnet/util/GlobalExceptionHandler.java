@@ -1,7 +1,6 @@
 package com.thedan17.salesnet.util;
 
 import com.thedan17.salesnet.exception.*;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import org.springframework.beans.factory.annotation.Autowired;

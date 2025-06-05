@@ -1,37 +1,28 @@
 package com.thedan17.salesnet.core.controller;
 
 import com.thedan17.salesnet.core.dao.AccGroupLinkRepository;
-import com.thedan17.salesnet.core.dao.AccountRepository;
 import com.thedan17.salesnet.core.dao.GroupRepository;
 import com.thedan17.salesnet.core.object.dto.*;
 import com.thedan17.salesnet.core.object.entity.AccGroupLink;
 import com.thedan17.salesnet.core.object.entity.Account;
 import com.thedan17.salesnet.core.object.entity.Group;
 import com.thedan17.salesnet.core.service.AccGroupLinkService;
-import com.thedan17.salesnet.core.service.AccountService;
-import com.thedan17.salesnet.core.service.GroupService;
-import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.exception.InvalidRequestBodyException;
 import com.thedan17.salesnet.util.EntityMapper;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** Контроллер для создания и удаления связей между {@link Group} и {@link Account}. */
 @Tag(
@@ -50,6 +41,7 @@ public class AccGroupLinkController {
   AccGroupLinkRepository accGroupLinkRepository;
   @Autowired
   EntityMapper entityMapper;
+
   @GetMapping("/links")
   public ResponseEntity<List<AccGroupLinkDto>> getAllLinks() {
     return ResponseEntity.ok(
@@ -60,6 +52,7 @@ public class AccGroupLinkController {
                     .toList()
     );
   }
+
   @PostMapping("/links")
   public ResponseEntity<AccGroupLinkDto> addLink(@Valid @RequestBody AccGroupLinkCreateDto newLink) {
     var link = accGroupLinkService.linkAccWithGroup(newLink);
@@ -68,11 +61,13 @@ public class AccGroupLinkController {
     }
     return ResponseEntity.ok(link.get());
   }
+
   @DeleteMapping("/links/{id}")
   public ResponseEntity<Void> deleteLink(@Valid @Min(1) @PathVariable Long id) {
     accGroupLinkService.deleteLink(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
+
   @GetMapping("/links/allgroupswithaccounts")
   public ResponseEntity<List<GroupAccountsDto>> getAllGroupsAccounts() {
     List<Group> groups = groupRepository.findAll();

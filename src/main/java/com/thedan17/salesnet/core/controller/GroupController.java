@@ -13,12 +13,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.List;
-import java.util.Set;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -41,19 +39,13 @@ public class GroupController {
 
   @Autowired private GroupRepository groupRepository;
   @Autowired private EntityMapper entityMapper;
+
   @Operation(summary = "Получить все группы")
-  @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Список получен")
-  })
+  @ApiResponses({@ApiResponse(responseCode = "200", description = "Список получен")})
   @GetMapping
   public ResponseEntity<List<GroupIdDto>> getAllAccounts() {
     return ResponseEntity.ok(
-            groupRepository
-                    .findAll()
-                    .stream()
-                    .map(entityMapper::groupToIdDto)
-                    .toList()
-    );
+        groupRepository.findAll().stream().map(entityMapper::groupToIdDto).toList());
   }
 
   /**
@@ -116,7 +108,8 @@ public class GroupController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @GetMapping("/{id}/accounts")
-  public ResponseEntity<Set<AccountInfoDto>> getGroupAccounts(@Valid @Min(1) @PathVariable Long id) {
+  public ResponseEntity<Set<AccountInfoDto>> getGroupAccounts(
+      @Valid @Min(1) @PathVariable Long id) {
     return groupService
         .getGroupAccounts(id)
         .map(ResponseEntity::ok)
@@ -138,7 +131,7 @@ public class GroupController {
   })
   @PutMapping("/{id}")
   public ResponseEntity<GroupIdDto> updateGroup(
-          @Valid @Min(1) @PathVariable Long id, @Valid @RequestBody GroupCreateDto updatedGroup) {
+      @Valid @Min(1) @PathVariable Long id, @Valid @RequestBody GroupCreateDto updatedGroup) {
     return groupService
         .updateGroup(id, updatedGroup)
         .map(ResponseEntity::ok) // Если Optional содержиLт группу

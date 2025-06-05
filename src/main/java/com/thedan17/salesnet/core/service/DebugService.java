@@ -1,14 +1,8 @@
 package com.thedan17.salesnet.core.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import com.thedan17.salesnet.exception.ContentNotFoundException;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

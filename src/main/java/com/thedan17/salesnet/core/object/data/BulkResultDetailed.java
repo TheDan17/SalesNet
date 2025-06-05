@@ -51,8 +51,11 @@ public class BulkResultDetailed {
   /** Присваивание количества элементов с помощью StreamAPI на основе имеющихся результатов. */
   private void initAmounts() {
     this.totalAmount = this.results.size();
-    this.successAmount = Math.toIntExact(this.results.stream()
-            .filter(elem -> elem.getStatus() == ElementStatus.SUCCESS).count());
+    this.successAmount =
+        Math.toIntExact(
+            this.results.stream()
+                .filter(elem -> elem.getStatus() == ElementStatus.SUCCESS)
+                .count());
     this.failureAmount = totalAmount - successAmount;
   }
 
@@ -67,29 +70,29 @@ public class BulkResultDetailed {
   }
 
   private void updateResult(ElementResult elem) {
-    Optional<ElementResult> result = this.results.stream()
-            .filter(item -> item.getIndex().equals(elem.getIndex()))
-            .findFirst();
-    if (result.isPresent()){
+    Optional<ElementResult> result =
+        this.results.stream().filter(item -> item.getIndex().equals(elem.getIndex())).findFirst();
+    if (result.isPresent()) {
       if (elem.status == ElementStatus.FAILURE) {
         result.get().status = elem.status;
         result.get().errors.addAll(elem.errors);
       }
     } else {
       throw new IllegalStateException(
-              "Impossible for an object to be missing when calling 'updateResult' method.");
+          "Impossible for an object to be missing when calling 'updateResult' method.");
     }
   }
 
-  /** Обёртка для добавления результата, с удобной активацией подсчёта элементов.
+  /**
+   * Обёртка для добавления результата, с удобной активацией подсчёта элементов.
    *
    * <p>Если объект с таким индексом уже существует, обновляет его.
+   *
    * @see BulkResultDetailed#updateResult(ElementResult)
    */
   private void addResult(ElementResult result, boolean isUpdateAmounts) {
-    Optional<ElementResult> elem = this.results.stream()
-            .filter(item -> item.getIndex().equals(result.getIndex()))
-            .findFirst();
+    Optional<ElementResult> elem =
+        this.results.stream().filter(item -> item.getIndex().equals(result.getIndex())).findFirst();
     if (elem.isPresent()) {
       updateResult(result);
     } else {
@@ -112,12 +115,10 @@ public class BulkResultDetailed {
   /** Инъекция зависимости для автоматизированной обработки одного элемента. */
   public static <T> ElementResult createResult(
       long index, T item, Function<T, List<ValidationError>> processor) {
-    List<ElementError> processorResult = new ArrayList<>(
-        processor.apply(item).stream()
-            .map(BulkResultDetailed::convertToBulkError)
-            .toList());
-    ElementResult result =
-        new ElementResult(-1L, ElementStatus.SUCCESS, new ArrayList<>());
+    List<ElementError> processorResult =
+        new ArrayList<>(
+            processor.apply(item).stream().map(BulkResultDetailed::convertToBulkError).toList());
+    ElementResult result = new ElementResult(-1L, ElementStatus.SUCCESS, new ArrayList<>());
     if (!processorResult.isEmpty()) {
       result.status = ElementStatus.FAILURE;
       result.errors = processorResult;
@@ -131,25 +132,18 @@ public class BulkResultDetailed {
   /**
    * Обёртка для прямого добавления результата {@link BulkResultDetailed#createResult}.
    *
-   * <p>При добавлении результат передаётся в {@link #addResult(ElementResult, boolean)}
-   * с флагом {@code isUpdateAmounts = true}.
+   * <p>При добавлении результат передаётся в {@link #addResult(ElementResult, boolean)} с флагом
+   * {@code isUpdateAmounts = true}.
    */
   public <T> void addResult(long index, T item, Function<T, List<ValidationError>> processor) {
     this.addResult(createResult(index, item, processor), true);
   }
 
   /** Аналог {@link BulkResultDetailed#addResult(long, Object, Function)}, но для списка целиком. */
-  public <T> void addResults(List<Pair<Long, T>> indexItems, Function<T, List<ValidationError>> processor) {
-    indexItems.forEach(pair ->
-        addResult(
-                createResult(
-                        pair.getFirst(),
-                        pair.getSecond(),
-                        processor
-                ),
-                false
-        )
-    );
+  public <T> void addResults(
+      List<Pair<Long, T>> indexItems, Function<T, List<ValidationError>> processor) {
+    indexItems.forEach(
+        pair -> addResult(createResult(pair.getFirst(), pair.getSecond(), processor), false));
     initAmounts();
   }
 

@@ -1,10 +1,8 @@
 package com.thedan17.salesnet.core.object.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

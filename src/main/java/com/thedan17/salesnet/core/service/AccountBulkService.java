@@ -9,11 +9,9 @@ import com.thedan17.salesnet.core.validation.validator.AccountLoginDtoValidator;
 import com.thedan17.salesnet.exception.InvalidRequestBodyException;
 import com.thedan17.salesnet.util.CommonUtil;
 import com.thedan17.salesnet.util.EntityMapper;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -28,7 +26,7 @@ public class AccountBulkService {
   AccountRepository accountRepository;
   EntityMapper entityMapper;
 
-  public AccountBulkService (AccountRepository accountRepository, EntityMapper entityMapper) {
+  public AccountBulkService(AccountRepository accountRepository, EntityMapper entityMapper) {
     this.accountRepository = accountRepository;
     this.entityMapper = entityMapper;
   }
@@ -55,6 +53,7 @@ public class AccountBulkService {
       throw new InvalidRequestBodyException("Exception occured in bulk saving: " + e.getMessage());
     }
   }
+
   public BulkResultDetailed addAccountsBulk(List<AccountSignupDto> accountsDto) {
     BulkResultDetailed processResult = new BulkResultDetailed();
     IntStream.range(0, accountsDto.size())

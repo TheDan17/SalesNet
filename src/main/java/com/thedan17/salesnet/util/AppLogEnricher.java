@@ -1,9 +1,8 @@
 package com.thedan17.salesnet.util;
 
+import ch.qos.logback.classic.Level;
 import java.util.HashMap;
 import java.util.Map;
-
-import ch.qos.logback.classic.Level;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;

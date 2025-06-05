@@ -9,7 +9,8 @@ public class PasswordCheckUtil {
   private static final Pattern UPPERCASE = Pattern.compile("[A-Z]");
   private static final Pattern LOWERCASE = Pattern.compile("[a-z]");
   private static final Pattern DIGIT = Pattern.compile("\\d");
-  public static final List<String> KEY_ROWS = List.of(
+  public static final List<String> KEY_ROWS =
+      List.of(
           "qwertyuiop", "poiuytrewq",
           "asdfghjkl", "lkjhgfdsa",
           "zxcvbnm", "mnbvcxz");
@@ -32,7 +33,7 @@ public class PasswordCheckUtil {
   }
 
   public static boolean doesNotContainRepeatedChars(String password) {
-    if (password == null){
+    if (password == null) {
       return true;
     }
     return !Pattern.compile("(.)\\1{2,}").matcher(password).find();
@@ -45,7 +46,7 @@ public class PasswordCheckUtil {
     return password != null && password.matches("^\\w+$");
   }
 
-  public static boolean haveEnoughLength(String password){
+  public static boolean haveEnoughLength(String password) {
     return password != null && password.length() >= REQUIRED_PASSWORD_LENGTH;
   }
 
@@ -103,7 +104,7 @@ public class PasswordCheckUtil {
 
   /** Запрещаем любые символьные фрагменты заданной длины. */
   public static boolean doesNotContainSequences(String password) {
-    return !containsKeyboardSequence(password, REQUIRED_SEQUENCE_LENGTH_DETECT) &&
-            !containsNumericSequence(password, REQUIRED_SEQUENCE_LENGTH_DETECT);
+    return !containsKeyboardSequence(password, REQUIRED_SEQUENCE_LENGTH_DETECT)
+        && !containsNumericSequence(password, REQUIRED_SEQUENCE_LENGTH_DETECT);
   }
 }

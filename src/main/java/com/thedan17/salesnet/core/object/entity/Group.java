@@ -1,15 +1,12 @@
 package com.thedan17.salesnet.core.object.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /** Сущность для представления существующей группы, в которому могут вступать {@code Account}. */

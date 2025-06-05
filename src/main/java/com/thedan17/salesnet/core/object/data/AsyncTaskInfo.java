@@ -5,7 +5,7 @@ import java.time.Instant;
 import lombok.Data;
 
 @Data
-public class AsyncTaskInfo <I, O> {
+public class AsyncTaskInfo<I, O> {
   private final Integer id;
   private volatile Status status;
   private final I params;

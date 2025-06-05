@@ -1,9 +1,8 @@
 package com.thedan17.salesnet.core.object.dto;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class GroupAccountsDto {

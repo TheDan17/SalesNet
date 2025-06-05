@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Контроллер для bulk операций, связанных с {@link
- * com.thedan17.salesnet.core.object.entity.Account}
+ * com.thedan17.salesnet.core.object.entity.Account}.
  */
 @Tag(name = "Bulk API", description = "Операции пакетной обработки")
 @RestController
@@ -33,17 +33,16 @@ public class AccountBulkController {
    * @see AccountBulkService#addAccountsBulk(List)
    */
   @Operation(
-          summary = "Создать множество аккаунтов",
-          description =
-                  "Возвращает структуру, отображающую успешные и неуспешные по обработке элементы")
+      summary = "Создать множество аккаунтов",
+      description =
+          "Возвращает структуру, отображающую успешные и неуспешные по обработке элементы")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Все элементы были обработаны успешно"),
-          @ApiResponse(responseCode = "207", description = "Элементы были частично успешно обработаны"),
-          @ApiResponse(responseCode = "400", description = "Ни один элемент не был обработан успешно")
+    @ApiResponse(responseCode = "200", description = "Все элементы были обработаны успешно"),
+    @ApiResponse(responseCode = "207", description = "Элементы были частично успешно обработаны"),
+    @ApiResponse(responseCode = "400", description = "Ни один элемент не был обработан успешно")
   })
   @PostMapping("/accounts/bulk")
-  ResponseEntity<Void> addAccountsBulkWhole(
-          @RequestBody List<AccountSignupDto> accountsData) {
+  ResponseEntity<Void> addAccountsBulkWhole(@RequestBody List<AccountSignupDto> accountsData) {
     accountBulkService.addAccountsBulkWhole(accountsData);
     return ResponseEntity.ok().build();
   }

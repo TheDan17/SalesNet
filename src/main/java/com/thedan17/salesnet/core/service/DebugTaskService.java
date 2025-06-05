@@ -4,10 +4,6 @@ import com.thedan17.salesnet.core.object.data.AsyncTaskInfo;
 import com.thedan17.salesnet.exception.ContentNotFoundException;
 import com.thedan17.salesnet.exception.RequestIgnoreNeededException;
 import com.thedan17.salesnet.util.AppLoggerCore;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,14 +17,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 @Service
 public class DebugTaskService {
   public final Map<Integer, AsyncTaskInfo<LocalDate, Path>> tasks = new ConcurrentHashMap<>();
   private final AtomicInteger idCounter = new AtomicInteger(0);
 
-  @Autowired
-  public AppLoggerCore appLoggerCore;
+  @Autowired public AppLoggerCore appLoggerCore;
 
   public void runLogTask(AsyncTaskInfo<LocalDate, Path> taskInfo) {
     taskInfo.setStatus(AsyncTaskInfo.Status.RUNNING);
@@ -52,13 +50,11 @@ public class DebugTaskService {
     int taskId = idCounter.incrementAndGet();
     AsyncTaskInfo<LocalDate, Path> taskInfo = new AsyncTaskInfo<>(taskId, date);
     tasks.put(taskId, taskInfo);
-    CompletableFuture.runAsync(
-            () -> runLogTask(taskInfo)
-    );
+    CompletableFuture.runAsync(() -> runLogTask(taskInfo));
     return taskId;
   }
 
-  public AsyncTaskInfo<LocalDate, Path> getTaskInfo(Integer taskId){
+  public AsyncTaskInfo<LocalDate, Path> getTaskInfo(Integer taskId) {
     AsyncTaskInfo<LocalDate, Path> taskInfo = tasks.get(taskId);
     if (taskInfo == null) {
       throw new ContentNotFoundException("Task with such ID don't exist");
@@ -76,8 +72,8 @@ public class DebugTaskService {
 
   public Path getLogFile(Integer taskId) {
     AsyncTaskInfo<LocalDate, Path> taskInfo = getTaskInfo(taskId);
-    if (taskInfo.getStatus() != AsyncTaskInfo.Status.DONE &&
-        taskInfo.getStatus() != AsyncTaskInfo.Status.FAILED) {
+    if (taskInfo.getStatus() != AsyncTaskInfo.Status.DONE
+        && taskInfo.getStatus() != AsyncTaskInfo.Status.FAILED) {
       throw new RequestIgnoreNeededException("Task not ready yet, please wait and try again later");
     }
     return taskInfo.getResult();
@@ -88,7 +84,8 @@ public class DebugTaskService {
     String fileNamePattern = "log-" + logDate + ".log"; // Например, "log-2023-10-05.log"
 
     try (Stream<Path> paths = Files.list(Paths.get(logDir))) {
-      Optional<Path> logPath = paths
+      Optional<Path> logPath =
+          paths
               .filter(Files::isRegularFile)
               .filter(path -> path.getFileName().toString().equals(fileNamePattern))
               .findFirst();
@@ -106,13 +103,16 @@ public class DebugTaskService {
   public void cleanupOldTasks() {
     try {
       Instant cutoff = Instant.now().minusSeconds(300); // 5 minutes
-      tasks.entrySet().removeIf(entry -> {
-        AsyncTaskInfo<LocalDate, Path> info = entry.getValue();
-        info.calcDuration();
-        return (info.getStatus() == AsyncTaskInfo.Status.DONE ||
-                info.getStatus() == AsyncTaskInfo.Status.FAILED ) &&
-                info.getCompletedAt().isBefore(cutoff);
-      });
+      tasks
+          .entrySet()
+          .removeIf(
+              entry -> {
+                AsyncTaskInfo<LocalDate, Path> info = entry.getValue();
+                info.calcDuration();
+                return (info.getStatus() == AsyncTaskInfo.Status.DONE
+                        || info.getStatus() == AsyncTaskInfo.Status.FAILED)
+                    && info.getCompletedAt().isBefore(cutoff);
+              });
     } catch (Exception e) {
       appLoggerCore.error("Exception while cleanup tasks in DebugTaskService: " + e.getMessage());
     }

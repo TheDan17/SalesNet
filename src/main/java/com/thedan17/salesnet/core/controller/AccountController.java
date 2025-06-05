@@ -17,8 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Set;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,22 +38,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/accounts")
 public class AccountController {
   @Autowired private final AccountService accountService;
-
   @Autowired private AccountRepository accountRepository;
   @Autowired private EntityMapper entityMapper;
+
   @Operation(summary = "Получить все аккаунты")
-  @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Список получен")
-  })
+  @ApiResponses({@ApiResponse(responseCode = "200", description = "Список получен")})
   @GetMapping
   public ResponseEntity<List<AccountInfoDto>> getAllAccounts() {
     return ResponseEntity.ok(
-            accountRepository
-                    .findAll()
-                    .stream()
-                    .map(entityMapper::accountToInfoDto)
-                    .toList()
-    );
+        accountRepository.findAll().stream().map(entityMapper::accountToInfoDto).toList());
   }
 
   /** Конструктор для привязки соответствующего сервисного слоя. */
@@ -85,7 +76,8 @@ public class AccountController {
         content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PostMapping
-  public ResponseEntity<AccountInfoDto> createAccount(@Valid @RequestBody AccountSignupDto account) {
+  public ResponseEntity<AccountInfoDto> createAccount(
+      @Valid @RequestBody AccountSignupDto account) {
     return accountService
         .addAccount(account)
         .map(infoDto -> ResponseEntity.status(HttpStatus.CREATED).body(infoDto))
@@ -152,7 +144,7 @@ public class AccountController {
   })
   @PutMapping("/{id}")
   public ResponseEntity<AccountInfoDto> updateAccount(
-          @Valid @Min(1) @PathVariable Long id, @RequestBody AccountUpdateDto updatedAccount) {
+      @Valid @Min(1) @PathVariable Long id, @RequestBody AccountUpdateDto updatedAccount) {
     return accountService
         .updateAccount(id, updatedAccount)
         .map(infoDto -> ResponseEntity.status(HttpStatus.OK).body(infoDto))

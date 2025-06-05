@@ -43,7 +43,7 @@ public class AccGroupLinkService {
     if (groupOptional.isEmpty()) {
       throw new ContentNotFoundException("Group with such ID not found");
     }
-    if (accountOptional.isEmpty()){
+    if (accountOptional.isEmpty()) {
       throw new ContentNotFoundException("Account with such ID not found");
     }
     Group group = groupOptional.get();

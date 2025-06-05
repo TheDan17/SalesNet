@@ -40,7 +40,7 @@ public class AccountService {
   @Transactional
   public Optional<AccountInfoDto> addAccount(AccountSignupDto accountSignupDto) {
     Account account = entityMapper.loginDtoToAccount(accountSignupDto);
-    if (account.getSecondName() == null){
+    if (account.getSecondName() == null) {
       account.setSecondName("");
     }
     account.setPasswordHash(CommonUtil.hashWithSha256(accountSignupDto.getPassword()));
