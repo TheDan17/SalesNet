@@ -11,7 +11,7 @@ public class AsyncTaskInfo <I, O> {
   private final I params;
   private O result;
   private Instant completedAt;
-  private Long timeUntilDeletion; // minutes
+  private Long minutesUntilDeletion;
 
   public AsyncTaskInfo(Integer id, I params) {
     this.id = id;
@@ -24,12 +24,16 @@ public class AsyncTaskInfo <I, O> {
     Instant deletionTime = completedAt.plus(Duration.ofMinutes(5));
     Instant now = Instant.now();
     Duration time = Duration.between(now, deletionTime);
-    this.timeUntilDeletion = time.toMinutes();
+    this.minutesUntilDeletion = time.toMinutes();
   }
 
   public void setCompletedAt(Instant completedAt) {
     this.completedAt = completedAt;
     calcDuration();
+  }
+
+  public Long getMinutesUntilDeletion() {
+    return this.minutesUntilDeletion;
   }
 
   public enum Status {

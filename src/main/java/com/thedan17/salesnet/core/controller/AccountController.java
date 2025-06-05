@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
   @Autowired private final AccountService accountService;
 
-  // TODO fix
   @Autowired private AccountRepository accountRepository;
   @Autowired private EntityMapper entityMapper;
   @Operation(summary = "Получить все аккаунты")

@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupController {
   @Autowired private GroupService groupService;
 
-  // TODO fix
   @Autowired private GroupRepository groupRepository;
   @Autowired private EntityMapper entityMapper;
   @Operation(summary = "Получить все группы")

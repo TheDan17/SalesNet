@@ -95,7 +95,9 @@ public class DebugTaskService {
       if (logPath.isPresent()) {
         return logPath.get();
       }
-    } catch (IOException e) {}
+    } catch (IOException e) {
+      appLoggerCore.warn("getLogByDate IOException: " + e.getMessage());
+    }
 
     return null;
   }

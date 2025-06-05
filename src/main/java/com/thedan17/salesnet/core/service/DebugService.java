@@ -16,10 +16,6 @@ import org.springframework.stereotype.Service;
 public class DebugService {
   @Autowired private DebugTaskService debugTaskService;
 
-  //public DebugService(DebugTaskService debugTaskService) {
-  //  this.debugTaskService = debugTaskService;
-  //}
-
   public Path getLogByDate(LocalDate logDate) {
     Path path = debugTaskService.getLogByDate(logDate);
     if (path == null) {

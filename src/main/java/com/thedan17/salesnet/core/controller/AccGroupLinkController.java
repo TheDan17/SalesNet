@@ -44,7 +44,6 @@ public class AccGroupLinkController {
   @Autowired
   AccGroupLinkService accGroupLinkService;
 
-  // TODO fix
   @Autowired
   GroupRepository groupRepository;
   @Autowired
@@ -88,71 +87,6 @@ public class AccGroupLinkController {
     }
     return ResponseEntity.ok(dtos);
   }
-
-  /*@PostMapping(value = "/links")
-  public ResponseEntity<AccGroupLinkDto> addLink(
-          @RequestParam Long groupId, @RequestParam Long accountId) {
-    return accGroupLinkService
-            .linkAccWithGroup(accountId, groupId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.badRequest().build());
-  }*/
-
-  /**
-   * CREATE endpoint - Создание связи через точку входа {@code Account}.
-   *
-   * <p>Например, {@code curl -X POST accounts/2/groups?id=4}
-   *
-   * @param accId id аккаунта, который добавится в группу
-   * @param id id группы
-   * @return {@code AccGroupLink} - созданная связь в виде json
-   */
-  /*
-  @Operation(summary = "Создание связи с группой через точку входа accounts")
-  @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Связь создана успешно"),
-    @ApiResponse(
-        responseCode = "400",
-        description = "Один из ID не существует",
-        content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-  })
-  @PostMapping(value = "accounts/{accId}/groups")
-  public ResponseEntity<AccGroupLinkDto> addGroupToAcc(
-      @PathVariable Long accId, @RequestParam Long id) {
-    return accGroupLinkService
-        .linkAccWithGroup(accId, id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.badRequest().build());
-  }
-  */
-
-  /**
-   * CREATE endpoint - Создание связи через точку входа {@code Group}.
-   *
-   * <p>Например, {@code curl -X POST groups/4/accounts?id=2}
-   *
-   * @param groupId id группы
-   * @param id id аккаунта, который добавится в группу
-   * @return объект созданной связи
-   */
-  /*
-  @Operation(summary = "Создание связи с аккаунтом через точку входа groups")
-  @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Связь создана успешно"),
-    @ApiResponse(
-        responseCode = "400",
-        description = "Один из ID не существует",
-        content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-  })
-  @PostMapping(value = "groups/{groupId}/accounts")
-  public ResponseEntity<AccGroupLinkDto> addAccToGroup(
-      @PathVariable Long groupId, @RequestParam Long id) {
-    return accGroupLinkService
-        .linkAccWithGroup(id, groupId)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.badRequest().build());
-  }
-  */
 
   /**
    * DELETE endpoint - Удаление связи через точку входа {@code Account}.
